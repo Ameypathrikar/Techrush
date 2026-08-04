@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import CountUpModule from "react-countup";
 import { 
   FiSearch, 
@@ -24,11 +24,37 @@ export default function Home() {
   const [destinationQuery, setDestinationQuery] = useState("");
   const [budgetQuery, setBudgetQuery] = useState("");
   const [activeWeatherFilter, setActiveWeatherFilter] = useState("All");
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
+    setShowDropdown(false);
     navigate(`/explore?search=${destinationQuery}&budget=${budgetQuery}`);
   };
+
+  const handleSelectDestination = (name) => {
+    setDestinationQuery(name);
+    setShowDropdown(false);
+  };
+
+  // Filter destinations for live dropdown list
+  const dropdownMatches = DESTINATIONS.filter((dest) =>
+    dest.name.toLowerCase().includes(destinationQuery.toLowerCase()) ||
+    dest.type.toLowerCase().includes(destinationQuery.toLowerCase())
+  );
 
   const filteredTrending = DESTINATIONS.filter((dest) => {
     if (activeWeatherFilter === "All") return true;
@@ -48,108 +74,176 @@ export default function Home() {
             alt="Ocean Beach Sunset Background" 
             className="w-full h-full object-cover object-center scale-105"
           />
-          {/* Multi-stage dark overlays for readability */}
           <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[2px]" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-950/80" />
         </div>
 
         <div className="max-w-5xl mx-auto text-center space-y-6 relative z-10">
           
-          {/* Glassmorphic Badge */}
+          {/* Professional Glass Badge */}
           <motion.div 
             initial={{ opacity: 0, y: -8 }} 
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-teal-500/40 text-teal-300 text-xs font-bold shadow-xl shadow-slate-950/50"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-teal-500/30 text-teal-300 text-xs font-semibold shadow-xl"
           >
-            <FiZap className="text-teal-400 animate-pulse" />
-            <span>AI Itinerary Engine & Real-Time Weather Planning</span>
+            <FiZap className="text-teal-400" />
+            <span>Intelligent Travel Engine</span>
           </motion.div>
 
-          {/* Main Hero Title */}
+          {/* Clean Main Heading */}
           <motion.h1 
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.15] text-white drop-shadow-md"
           >
-            Plan Perfect Trips with <br />
+            Find Your Next Escape, <br />
             <span className="bg-gradient-to-r from-teal-300 via-emerald-300 to-cyan-300 bg-clip-text text-transparent">
-              Live Weather & Smart Guidance
+              Planned Effortlessly
             </span>
           </motion.h1>
 
-          {/* Subheading */}
+          {/* Minimal Subheading */}
           <motion.p 
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="max-w-2xl mx-auto text-slate-200 text-sm sm:text-base leading-relaxed drop-shadow"
+            className="max-w-xl mx-auto text-slate-200 text-sm sm:text-base font-normal leading-relaxed drop-shadow"
           >
-            Discover seasonal destinations, craft daily activity schedules, estimate travel budgets, 
-            and avoid overcrowded tourist spots with live condition maps.
+            Discover optimal destinations, build custom itineraries, and track live conditions—all in one place.
           </motion.p>
 
-          {/* Frosted Glass Search Box */}
+          {/* Expanded Floating Search Form */}
           <motion.div 
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="max-w-3xl mx-auto pt-4"
+            className="max-w-4xl mx-auto pt-6 relative"
+            ref={dropdownRef}
           >
             <form 
               onSubmit={handleSearch}
-              className="p-3 bg-slate-900/80 backdrop-blur-xl rounded-2xl sm:rounded-full border border-slate-700/60 shadow-2xl shadow-slate-950/80 grid grid-cols-1 sm:grid-cols-12 gap-3 text-left items-center"
+              className="p-4 sm:p-5 bg-slate-900/90 backdrop-blur-2xl rounded-3xl sm:rounded-full border border-teal-500/30 shadow-2xl shadow-slate-950/90 grid grid-cols-1 sm:grid-cols-12 gap-4 text-left items-center"
             >
-              <div className="sm:col-span-5 px-4 py-2 flex items-center gap-3 border-b sm:border-b-0 sm:border-r border-slate-700/60">
-                <FiMapPin className="text-teal-400 text-lg flex-shrink-0" />
+              {/* Destination Input Box */}
+              <div className="sm:col-span-5 px-5 py-3 flex items-center gap-4 border-b sm:border-b-0 sm:border-r border-slate-700/60 relative">
+                <FiMapPin className="text-teal-400 text-2xl flex-shrink-0" />
                 <div className="w-full">
-                  <label className="block text-[9px] font-extrabold uppercase tracking-widest text-slate-300">Destination</label>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-slate-300 mb-0.5">Destination</label>
                   <input
                     type="text"
-                    placeholder="Where to? (e.g. Goa, Manali)"
+                    placeholder="Where to? (e.g. Goa, Manali, Ladakh)"
                     value={destinationQuery}
-                    onChange={(e) => setDestinationQuery(e.target.value)}
-                    className="w-full bg-transparent text-xs font-semibold text-white placeholder-slate-400 focus:outline-none"
+                    onFocus={() => setShowDropdown(true)}
+                    onChange={(e) => {
+                      setDestinationQuery(e.target.value);
+                      setShowDropdown(true);
+                    }}
+                    className="w-full bg-transparent text-sm sm:text-base font-bold text-white placeholder-slate-400 focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div className="sm:col-span-4 px-4 py-2 flex items-center gap-3">
-                <FiDollarSign className="text-emerald-400 text-lg flex-shrink-0" />
+              {/* Max Budget Input Box */}
+              <div className="sm:col-span-4 px-5 py-3 flex items-center gap-4">
+                <FiDollarSign className="text-emerald-400 text-2xl flex-shrink-0" />
                 <div className="w-full">
-                  <label className="block text-[9px] font-extrabold uppercase tracking-widest text-slate-300">Max Budget</label>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-slate-300 mb-0.5">Max Budget</label>
                   <input
                     type="text"
                     placeholder="e.g. ₹2,000 / day"
                     value={budgetQuery}
                     onChange={(e) => setBudgetQuery(e.target.value)}
-                    className="w-full bg-transparent text-xs font-semibold text-white placeholder-slate-400 focus:outline-none"
+                    className="w-full bg-transparent text-sm sm:text-base font-bold text-white placeholder-slate-400 focus:outline-none"
                   />
                 </div>
               </div>
 
+              {/* Search Action Button */}
               <div className="sm:col-span-3">
                 <button
                   type="submit"
-                  className="w-full h-11 rounded-xl sm:rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-teal-500/30 transition-all cursor-pointer transform hover:scale-[1.02]"
+                  className="w-full h-14 rounded-2xl sm:rounded-full bg-gradient-to-r from-teal-400 via-emerald-400 to-teal-500 hover:from-teal-300 hover:to-emerald-300 text-slate-950 font-black text-sm flex items-center justify-center gap-2.5 shadow-xl shadow-teal-500/30 transition-all cursor-pointer transform hover:scale-[1.02]"
                 >
-                  <FiSearch className="text-sm stroke-[3]" />
+                  <FiSearch className="text-base stroke-[3]" />
                   <span>Search</span>
                 </button>
               </div>
             </form>
 
-            {/* Popular Tags */}
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs">
-              <span className="font-semibold text-slate-300 drop-shadow">Popular:</span>
-              {["Goa", "Manali", "Jaipur", "Munnar"].map((tag) => (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => setDestinationQuery(tag)}
-                  className="px-3.5 py-1 rounded-full bg-slate-900/80 backdrop-blur-md hover:bg-slate-800 text-slate-200 font-medium transition-colors border border-slate-700/60 cursor-pointer shadow-sm"
+            {/* AUTOCOMPLETE DROPDOWN MENU */}
+            <AnimatePresence>
+              {showDropdown && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute left-0 right-0 mt-3 bg-slate-900/95 backdrop-blur-2xl border border-teal-500/40 rounded-3xl shadow-2xl shadow-slate-950/90 z-50 overflow-hidden text-left max-h-80 overflow-y-auto divide-y divide-slate-800/80"
                 >
-                  {tag}
+                  {dropdownMatches.length === 0 ? (
+                    <div className="p-5 text-center text-xs text-slate-400 font-semibold">
+                      No matching destinations found.
+                    </div>
+                  ) : (
+                    dropdownMatches.map((dest) => (
+                      <div
+                        key={dest.id}
+                        onClick={() => handleSelectDestination(dest.name)}
+                        className="p-4 hover:bg-teal-500/10 transition-colors flex items-center justify-between cursor-pointer group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <img 
+                            src={dest.image} 
+                            alt={dest.name} 
+                            className="w-10 h-10 rounded-xl object-cover border border-slate-700/60"
+                          />
+                          <div>
+                            <h4 className="text-sm font-extrabold text-white group-hover:text-teal-300 transition-colors">
+                              {dest.name}
+                            </h4>
+                            <p className="text-[11px] text-slate-400 font-medium">
+                              {dest.type} • ₹{dest.costPerDay} / day
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <span className="text-[11px] font-bold text-teal-400 bg-teal-500/10 px-2.5 py-1 rounded-full border border-teal-500/20">
+                            🌤️ {dest.weather?.temp}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Ultra-Highlighted Popular Tags */}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-2.5 text-xs">
+              <span className="font-black text-amber-400 uppercase tracking-widest text-[11px] mr-1 flex items-center gap-1.5 bg-amber-500/10 px-3.5 py-1.5 rounded-full border border-amber-500/30 shadow-sm">
+                <span className="animate-pulse">🔥</span> Popular Destinations:
+              </span>
+              
+              {[
+                { name: "Goa", emoji: "🏖️" },
+                { name: "Manali", emoji: "🏔️" },
+                { name: "Ladakh", emoji: "❄️" },
+                { name: "Jaipur", emoji: "🏰" },
+                { name: "Udaipur", emoji: "👑" },
+                { name: "Rishikesh", emoji: "🌊" }
+              ].map((dest) => (
+                <button
+                  key={dest.name}
+                  type="button"
+                  onClick={() => setDestinationQuery(dest.name)}
+                  className="group relative px-4 py-1.5 rounded-full bg-gradient-to-r from-teal-500/20 via-emerald-500/20 to-teal-500/20 hover:from-teal-400 hover:to-emerald-400 text-teal-200 hover:text-slate-950 font-extrabold text-xs transition-all duration-300 border border-teal-400/50 hover:border-teal-300 cursor-pointer shadow-lg shadow-teal-950/80 backdrop-blur-md transform hover:-translate-y-0.5 hover:scale-105"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <span>{dest.emoji}</span>
+                    <span>{dest.name}</span>
+                  </span>
+                  <div className="absolute inset-0 rounded-full bg-teal-400/20 opacity-0 group-hover:opacity-100 blur-sm transition-opacity pointer-events-none" />
                 </button>
               ))}
             </div>
@@ -218,7 +312,7 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTrending.slice(0, 3).map((dest) => (
+          {filteredTrending.map((dest) => (
             <div
               key={dest.id}
               className="bg-slate-900/90 rounded-2xl overflow-hidden border border-slate-800 hover:border-teal-500/50 shadow-xl transition-all duration-300 group flex flex-col justify-between"

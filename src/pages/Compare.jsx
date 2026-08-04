@@ -1,153 +1,165 @@
 import React, { useState } from "react";
 import { DESTINATIONS } from "../data/destinations";
-import { FiCheck, FiX, FiLayers } from "react-icons/fi";
+import { FiColumns, FiCheck, FiX, FiSun, FiUsers, FiDollarSign, FiStar } from "react-icons/fi";
 
 export default function Compare() {
-  const [dest1Id, setDest1Id] = useState(DESTINATIONS[0]?.id || "");
-  const [dest2Id, setDest2Id] = useState(DESTINATIONS[1]?.id || "");
+  const [selectedDest1, setSelectedDest1] = useState("manali");
+  const [selectedDest2, setSelectedDest2] = useState("goa");
 
-  const dest1 = DESTINATIONS.find((d) => d.id === dest1Id) || DESTINATIONS[0];
-  const dest2 = DESTINATIONS.find((d) => d.id === dest2Id) || DESTINATIONS[1];
+  const dest1 = DESTINATIONS.find((d) => d.id === selectedDest1) || DESTINATIONS[0];
+  const dest2 = DESTINATIONS.find((d) => d.id === selectedDest2) || DESTINATIONS[1];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 text-slate-900 dark:text-slate-100">
+      
+      {/* Header */}
       <div>
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-xs font-bold mb-2">
-          <FiLayers className="text-teal-600" />
-          <span>Destination Comparison Tool</span>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300 text-xs font-bold mb-2">
+          <FiColumns className="text-teal-600 dark:text-teal-400" />
+          <span>Side-by-Side Analysis Engine</span>
         </div>
-        <h1 className="text-3xl font-extrabold text-slate-900">Compare Destinations</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Evaluate weather, estimated daily budgets, crowd levels, and top attractions side-by-side.
+        
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
+          Compare Destinations
+        </h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          Evaluate weather, estimated daily budgets, crowd levels, and top attractions side-by-side[cite: 2].
         </p>
       </div>
 
-      {/* Selectors */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div>
-          <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">
-            Select First Destination
-          </label>
+      {/* Selectors Header */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Selector 1 */}
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Select Destination A</label>
           <select
-            value={dest1Id}
-            onChange={(e) => setDest1Id(e.target.value)}
-            className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-teal-500 focus:outline-none"
+            value={selectedDest1}
+            onChange={(e) => setSelectedDest1(e.target.value)}
+            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer"
           >
-            {DESTINATIONS.map((dest) => (
-              <option key={dest.id} value={dest.id}>
-                {dest.name} ({dest.type})
+            {DESTINATIONS.map((d) => (
+              <option key={d.id} value={d.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+                {d.name} ({d.type})
               </option>
             ))}
           </select>
         </div>
 
-        <div>
-          <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">
-            Select Second Destination
-          </label>
+        {/* Selector 2 */}
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Select Destination B</label>
           <select
-            value={dest2Id}
-            onChange={(e) => setDest2Id(e.target.value)}
-            className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-teal-500 focus:outline-none"
+            value={selectedDest2}
+            onChange={(e) => setSelectedDest2(e.target.value)}
+            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer"
           >
-            {DESTINATIONS.map((dest) => (
-              <option key={dest.id} value={dest.id}>
-                {dest.name} ({dest.type})
+            {DESTINATIONS.map((d) => (
+              <option key={d.id} value={d.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+                {d.name} ({d.type})
               </option>
             ))}
           </select>
         </div>
       </div>
 
-      {/* Comparison Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="grid grid-cols-3 bg-slate-100 border-b border-slate-200 p-4 text-xs font-bold uppercase tracking-wider text-slate-500">
-          <div>Feature</div>
-          <div className="text-teal-700 font-extrabold">{dest1?.name}</div>
-          <div className="text-teal-700 font-extrabold">{dest2?.name}</div>
-        </div>
+      {/* Comparison Table View */}
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+                <th className="p-4 text-xs font-bold uppercase tracking-wider text-slate-400 w-1/4">Feature</th>
+                <th className="p-4 text-xs font-extrabold uppercase tracking-wider text-teal-600 dark:text-teal-400 w-3/8">{dest1.name}</th>
+                <th className="p-4 text-xs font-extrabold uppercase tracking-wider text-teal-600 dark:text-teal-400 w-3/8">{dest2.name}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+              
+              {/* Preview Image */}
+              <tr>
+                <td className="p-4 font-bold text-slate-500 dark:text-slate-400">Preview</td>
+                <td className="p-4">
+                  <img src={dest1.image} alt={dest1.name} className="w-full h-32 sm:h-40 object-cover rounded-2xl border border-slate-200 dark:border-slate-800" />
+                </td>
+                <td className="p-4">
+                  <img src={dest2.image} alt={dest2.name} className="w-full h-32 sm:h-40 object-cover rounded-2xl border border-slate-200 dark:border-slate-800" />
+                </td>
+              </tr>
 
-        <div className="divide-y divide-slate-100 text-xs sm:text-sm">
-          {/* Images */}
-          <div className="grid grid-cols-3 p-4 items-center">
-            <div className="font-bold text-slate-500">Preview</div>
-            <div className="pr-4">
-              <img src={dest1?.image} alt={dest1?.name} className="w-full h-32 object-cover rounded-xl" />
-            </div>
-            <div className="pr-4">
-              <img src={dest2?.image} alt={dest2?.name} className="w-full h-32 object-cover rounded-xl" />
-            </div>
-          </div>
+              {/* Category */}
+              <tr>
+                <td className="p-4 font-bold text-slate-500 dark:text-slate-400">Category</td>
+                <td className="p-4 font-bold text-slate-900 dark:text-white">{dest1.type}</td>
+                <td className="p-4 font-bold text-slate-900 dark:text-white">{dest2.type}</td>
+              </tr>
 
-          {/* Category Type */}
-          <div className="grid grid-cols-3 p-4 items-center bg-slate-50/50">
-            <div className="font-bold text-slate-500">Category</div>
-            <div className="font-semibold text-slate-800">{dest1?.type}</div>
-            <div className="font-semibold text-slate-800">{dest2?.type}</div>
-          </div>
+              {/* Live Weather */}
+              <tr>
+                <td className="p-4 font-bold text-slate-500 dark:text-slate-400">Live Weather</td>
+                <td className="p-4">🌤️ {dest1.weather?.temp} ({dest1.weather?.condition})</td>
+                <td className="p-4">🌤️ {dest2.weather?.temp} ({dest2.weather?.condition})</td>
+              </tr>
 
-          {/* Weather & Season */}
-          <div className="grid grid-cols-3 p-4 items-center">
-            <div className="font-bold text-slate-500">Live Weather</div>
-            <div className="font-semibold text-slate-800">
-              🌤️ {dest1?.weather?.temp} ({dest1?.weather?.condition})
-            </div>
-            <div className="font-semibold text-slate-800">
-              🌤️ {dest2?.weather?.temp} ({dest2?.weather?.condition})
-            </div>
-          </div>
+              {/* Budget */}
+              <tr>
+                <td className="p-4 font-bold text-slate-500 dark:text-slate-400">Est. Daily Budget</td>
+                <td className="p-4 font-black text-teal-600 dark:text-teal-400">₹{dest1.costPerDay} / day</td>
+                <td className="p-4 font-black text-teal-600 dark:text-teal-400">₹{dest2.costPerDay} / day</td>
+              </tr>
 
-          {/* Daily Budget */}
-          <div className="grid grid-cols-3 p-4 items-center bg-slate-50/50">
-            <div className="font-bold text-slate-500">Est. Daily Budget</div>
-            <div className="font-bold text-teal-600">₹{dest1?.costPerDay} / day</div>
-            <div className="font-bold text-teal-600">₹{dest2?.costPerDay} / day</div>
-          </div>
+              {/* Traffic Level */}
+              <tr>
+                <td className="p-4 font-bold text-slate-500 dark:text-slate-400">Traffic / Crowd Level</td>
+                <td className="p-4">
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold text-white ${
+                    dest1.trafficStatus === "Overcrowded" ? "bg-rose-500" : dest1.trafficStatus === "Busy" ? "bg-amber-500" : "bg-emerald-500"
+                  }`}>
+                    {dest1.trafficStatus}
+                  </span>
+                </td>
+                <td className="p-4">
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold text-white ${
+                    dest2.trafficStatus === "Overcrowded" ? "bg-rose-500" : dest2.trafficStatus === "Busy" ? "bg-amber-500" : "bg-emerald-500"
+                  }`}>
+                    {dest2.trafficStatus}
+                  </span>
+                </td>
+              </tr>
 
-          {/* Traffic / Crowd */}
-          <div className="grid grid-cols-3 p-4 items-center">
-            <div className="font-bold text-slate-500">Traffic / Crowd Level</div>
-            <div>
-              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold text-white ${
-                dest1?.trafficStatus === "Overcrowded" ? "bg-rose-500" : dest1?.trafficStatus === "Busy" ? "bg-amber-500" : "bg-emerald-500"
-              }`}>
-                {dest1?.trafficStatus}
-              </span>
-            </div>
-            <div>
-              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold text-white ${
-                dest2?.trafficStatus === "Overcrowded" ? "bg-rose-500" : dest2?.trafficStatus === "Busy" ? "bg-amber-500" : "bg-emerald-500"
-              }`}>
-                {dest2?.trafficStatus}
-              </span>
-            </div>
-          </div>
+              {/* User Rating */}
+              <tr>
+                <td className="p-4 font-bold text-slate-500 dark:text-slate-400">User Rating</td>
+                <td className="p-4 font-bold text-amber-500">★ {dest1.rating} / 5.0</td>
+                <td className="p-4 font-bold text-amber-500">★ {dest2.rating} / 5.0</td>
+              </tr>
 
-          {/* Rating */}
-          <div className="grid grid-cols-3 p-4 items-center bg-slate-50/50">
-            <div className="font-bold text-slate-500">User Rating</div>
-            <div className="font-bold text-amber-500">★ {dest1?.rating} / 5.0</div>
-            <div className="font-bold text-amber-500">★ {dest2?.rating} / 5.0</div>
-          </div>
+              {/* Top Attractions */}
+              <tr>
+                <td className="p-4 font-bold text-slate-500 dark:text-slate-400">Top Attractions</td>
+                <td className="p-4">
+                  <ul className="space-y-1">
+                    {dest1.attractions?.map((a, i) => (
+                      <li key={i} className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300">
+                        <FiCheck className="text-teal-500 flex-shrink-0" />
+                        <span>{a}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </td>
+                <td className="p-4">
+                  <ul className="space-y-1">
+                    {dest2.attractions?.map((a, i) => (
+                      <li key={i} className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300">
+                        <FiCheck className="text-teal-500 flex-shrink-0" />
+                        <span>{a}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </td>
+              </tr>
 
-          {/* Attractions */}
-          <div className="grid grid-cols-3 p-4 items-start">
-            <div className="font-bold text-slate-500">Top Attractions</div>
-            <ul className="space-y-1 text-xs text-slate-600">
-              {dest1?.attractions?.map((attr, i) => (
-                <li key={i} className="flex items-center gap-1.5">
-                  <FiCheck className="text-teal-500" /> {attr}
-                </li>
-              ))}
-            </ul>
-            <ul className="space-y-1 text-xs text-slate-600">
-              {dest2?.attractions?.map((attr, i) => (
-                <li key={i} className="flex items-center gap-1.5">
-                  <FiCheck className="text-teal-500" /> {attr}
-                </li>
-              ))}
-            </ul>
-          </div>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
