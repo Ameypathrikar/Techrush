@@ -1,169 +1,224 @@
 import React, { useState, useRef, useEffect } from "react";
-import { 
-  FiNavigation, 
-  FiMapPin, 
-  FiSend, 
-  FiClock, 
-  FiDollarSign, 
-  FiExternalLink,
-  FiCompass 
-} from "react-icons/fi";
-import { DESTINATIONS } from "../../data/destinations";
 
-// Comprehensive List of Major Indian Starting Locations
-const INDIAN_CITIES = [
-  "Pune, Maharashtra",
-  "Mumbai, Maharashtra",
-  "Delhi NCR",
-  "Bengaluru, Karnataka",
-  "Hyderabad, Telangana",
-  "Chennai, Tamil Nadu",
-  "Kolkata, West Bengal",
-  "Ahmedabad, Gujarat",
-  "Jaipur, Rajasthan",
-  "Chandigarh, Punjab",
-  "Kochi, Kerala",
-  "Lucknow, Uttar Pradesh",
-  "Indore, Madhya Pradesh",
-  "Nagpur, Maharashtra",
-  "Surat, Gujarat",
-  "Patna, Bihar",
-  "Bhopal, Madhya Pradesh",
-  "Coimbatore, Tamil Nadu",
-  "Visakhapatnam, Andhra Pradesh",
-  "Guwahati, Assam"
+// Comprehensive Source Cities Across India with GPS Coordinates
+const SOURCE_CITIES = [
+  { name: "Pune", state: "Maharashtra", lat: 18.5204, lng: 73.8567 },
+  { name: "Mumbai", state: "Maharashtra", lat: 19.0760, lng: 72.8777 },
+  { name: "Delhi NCR", state: "Delhi", lat: 28.7041, lng: 77.1025 },
+  { name: "Bangalore", state: "Karnataka", lat: 12.9716, lng: 77.5946 },
+  { name: "Hyderabad", state: "Telangana", lat: 17.3850, lng: 78.4867 },
+  { name: "Chennai", state: "Tamil Nadu", lat: 13.0827, lng: 80.2707 },
+  { name: "Kolkata", state: "West Bengal", lat: 22.5726, lng: 88.3639 },
+  { name: "Ahmedabad", state: "Gujarat", lat: 23.0225, lng: 72.5714 },
+  { name: "Jaipur", state: "Rajasthan", lat: 26.9124, lng: 75.7873 },
+  { name: "Surat", state: "Gujarat", lat: 21.1702, lng: 72.8311 },
+  { name: "Lucknow", state: "Uttar Pradesh", lat: 26.8467, lng: 80.9462 },
+  { name: "Chandigarh", state: "Punjab/Haryana", lat: 30.7333, lng: 76.7794 },
+  { name: "Kochi", state: "Kerala", lat: 9.9312, lng: 76.2673 },
+  { name: "Indore", state: "Madhya Pradesh", lat: 22.7196, lng: 75.8577 },
+  { name: "Nagpur", state: "Maharashtra", lat: 21.1458, lng: 79.0882 }
+];
+
+// Destinations Database with Coordinates
+const DESTINATIONS = [
+  { 
+    id: "jaipur", 
+    name: "Jaipur", 
+    state: "Rajasthan", 
+    code: "JAI", 
+    lat: 26.9124, 
+    lng: 75.7873, 
+    distance: "1,150 km", 
+    flightDur: "1h 50m direct", 
+    flightFare: "4,200", 
+    trainDur: "18h Superfast", 
+    trainFare: "1,200", 
+    busDur: "22h AC Sleeper", 
+    busFare: "1,800", 
+    driveDur: "20 hrs via NH48", 
+    driveFare: "6,000" 
+  },
+  { 
+    id: "goa", 
+    name: "Goa Beaches", 
+    state: "Goa", 
+    code: "GOI", 
+    lat: 15.2993, 
+    lng: 74.1240, 
+    distance: "450 km", 
+    flightDur: "1h 05m direct", 
+    flightFare: "3,200", 
+    trainDur: "9h Express", 
+    trainFare: "850", 
+    busDur: "10h Sleeper", 
+    busFare: "1,200", 
+    driveDur: "9 hrs via NH66", 
+    driveFare: "3,800" 
+  },
+  { 
+    id: "manali", 
+    name: "Manali", 
+    state: "Himachal Pradesh", 
+    code: "KUU", 
+    lat: 32.2432, 
+    lng: 77.1892, 
+    distance: "1,650 km", 
+    flightDur: "2h 30m to Kullu", 
+    flightFare: "6,500", 
+    trainDur: "24h to Chandigarh", 
+    trainFare: "1,600", 
+    busDur: "28h Volvo", 
+    busFare: "2,200", 
+    driveDur: "30 hrs via NH44", 
+    driveFare: "8,500" 
+  },
+  { 
+    id: "udaipur", 
+    name: "Udaipur", 
+    state: "Rajasthan", 
+    code: "UDR", 
+    lat: 24.5854, 
+    lng: 73.7125, 
+    distance: "850 km", 
+    flightDur: "1h 30m direct", 
+    flightFare: "3,900", 
+    trainDur: "15h Express", 
+    trainFare: "1,100", 
+    busDur: "16h Sleeper", 
+    busFare: "1,500", 
+    driveDur: "15 hrs via NH48", 
+    driveFare: "5,000" 
+  },
+  { 
+    id: "darjeeling", 
+    name: "Darjeeling", 
+    state: "West Bengal", 
+    code: "IXB", 
+    lat: 27.0410, 
+    lng: 88.2663, 
+    distance: "2,100 km", 
+    flightDur: "2h 50m to Bagdogra", 
+    flightFare: "7,500", 
+    trainDur: "36h to NJP", 
+    trainFare: "2,300", 
+    busDur: "42h Sleeper", 
+    busFare: "3,100", 
+    driveDur: "40 hrs", 
+    driveFare: "11,500" 
+  }
 ];
 
 export default function ConnectivityHub() {
-  const [origin, setOrigin] = useState("Pune, Maharashtra");
-  const [selectedDestId, setSelectedDestId] = useState(DESTINATIONS[0]?.id || "manali");
-  const [showOriginDropdown, setShowOriginDropdown] = useState(false);
+  const [sourceInput, setSourceInput] = useState("Pune, Maharashtra");
+  const [selectedSource, setSelectedSource] = useState(SOURCE_CITIES[0]);
+  const [selectedDestId, setSelectedDestId] = useState("jaipur");
+  const [showSourceDropdown, setShowSourceDropdown] = useState(false);
 
-  const originRef = useRef(null);
-  const dest = DESTINATIONS.find((d) => d.id === selectedDestId) || DESTINATIONS[0];
+  const sourceRef = useRef(null);
+  const activeDest = DESTINATIONS.find((d) => d.id === selectedDestId) || DESTINATIONS[0];
 
-  // Close dropdown on outside click
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (originRef.current && !originRef.current.contains(event.target)) {
-        setShowOriginDropdown(false);
+    function handleClickOutside(event) {
+      if (sourceRef.current && !sourceRef.current.contains(event.target)) {
+        setShowSourceDropdown(false);
       }
-    };
+    }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Filter origins based on user input
-  const filteredOrigins = INDIAN_CITIES.filter((city) =>
-    city.toLowerCase().includes(origin.toLowerCase())
+  const sourceSuggestions = SOURCE_CITIES.filter((city) =>
+    `${city.name}, ${city.state}`.toLowerCase().includes(sourceInput.toLowerCase())
   );
 
-  const handleSelectOrigin = (cityName) => {
-    setOrigin(cityName);
-    setShowOriginDropdown(false);
-  };
-
-  // Route distance approximations relative to selected destination
-  const routeData = {
-    manali: { dist: "1,650 km", flight: "2h 15m to Kullu + 1h taxi", flightCost: "₹5,500", train: "26h to Chandigarh + 8h bus", trainCost: "₹1,400", bus: "32h direct Volvo", busCost: "₹2,200", drive: "30 hrs via NH44", driveCost: "₹8,000" },
-    goa: { dist: "440 km", flight: "1h 05m direct", flightCost: "₹2,800", train: "9h Express (Vande Bharat)", trainCost: "₹950", bus: "10h Sleeper Volvo", busCost: "₹1,100", drive: "8 hrs via NH66", driveCost: "₹3,500" },
-    jaipur: { dist: "1,150 km", flight: "1h 50m direct", flightCost: "₹4,200", train: "18h Superfast", trainCost: "₹1,200", bus: "22h AC Sleeper", busCost: "₹1,800", drive: "20 hrs via NH48", driveCost: "₹6,000" },
-    munnar: { dist: "1,100 km", flight: "2h to Kochi + 3h taxi", flightCost: "₹4,800", train: "22h to Ernakulam + 3h bus", trainCost: "₹1,300", bus: "24h AC Sleeper", busCost: "₹1,900", drive: "21 hrs via NH44", driveCost: "₹6,500" },
-    ladakh: { dist: "2,200 km", flight: "2h 30m direct to Leh", flightCost: "₹7,500", train: "30h to Jammu + 14h taxi", trainCost: "₹2,100", bus: "Not recommended direct", busCost: "N/A", drive: "38 hrs via Manali highway", driveCost: "₹12,000" },
-    udaipur: { dist: "850 km", flight: "1h 30m direct", flightCost: "₹3,800", train: "14h Express", trainCost: "₹1,100", bus: "16h AC Volvo", busCost: "₹1,400", drive: "15 hrs via NH48", driveCost: "₹4,800" },
-    rishikesh: { dist: "1,450 km", flight: "2h to Dehradun + 45m taxi", flightCost: "₹5,100", train: "24h to Haridwar + 40m cab", trainCost: "₹1,350", bus: "28h Volvo Sleeper", busCost: "₹2,100", drive: "26 hrs via NH44", driveCost: "₹7,200" },
-    ooty: { dist: "980 km", flight: "1h 40m to Coimbatore + 3h cab", flightCost: "₹4,500", train: "19h to Mettupalayam + Toy Train", trainCost: "₹1,250", bus: "20h AC Sleeper", busCost: "₹1,700", drive: "18 hrs via NH44", driveCost: "₹5,500" },
-    varanasi: { dist: "1,300 km", flight: "2h 10m direct", flightCost: "₹4,900", train: "22h Express", trainCost: "₹1,300", bus: "26h AC Bus", busCost: "₹2,000", drive: "24 hrs via NH19", driveCost: "₹6,800" },
-    andaman: { dist: "2,100 km", flight: "2h 45m direct to Port Blair", flightCost: "₹8,200", train: "N/A (Island)", trainCost: "N/A", bus: "N/A (Island)", busCost: "N/A", drive: "N/A", driveCost: "N/A" }
-  };
-
-  const currentRoute = routeData[dest.id] || routeData.manali;
-
-  const transitOptions = [
-    { type: "Flight ✈️", duration: currentRoute.flight, cost: currentRoute.flightCost, badge: "Fastest", color: "border-sky-500/30 text-sky-400 bg-sky-500/10" },
-    { type: "Train 🚆", duration: currentRoute.train, cost: currentRoute.trainCost, badge: "Scenic & Budget", color: "border-emerald-500/30 text-emerald-400 bg-emerald-500/10" },
-    { type: "Intercity Bus 🚌", duration: currentRoute.bus, cost: currentRoute.busCost, badge: "Overnight", color: "border-amber-500/30 text-amber-400 bg-amber-500/10" },
-    { type: "Self-Drive / Taxi 🚗", duration: currentRoute.drive, cost: currentRoute.driveCost, badge: "Flexible Roadtrip", color: "border-purple-500/30 text-purple-400 bg-purple-500/10" }
-  ];
+  // Using embedded query directions mode with compact view
+  const mapUrl = `https://maps.google.com/maps?saddr=${encodeURIComponent(
+    sourceInput
+  )}&daddr=${encodeURIComponent(
+    `${activeDest.name}, ${activeDest.state}`
+  )}&output=embed&z=6`;
 
   return (
-    <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6 text-slate-900 dark:text-slate-100">
+    <div className="bg-white dark:bg-[#0b1220] border border-slate-200 dark:border-slate-800/90 rounded-3xl p-6 sm:p-8 space-y-7 shadow-xl dark:shadow-2xl transition-colors">
       
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800/80 pb-5">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 rounded-2xl border border-sky-200 dark:border-sky-800">
-            <FiNavigation className="text-xl" />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white">Transit & Connectivity Hub</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Compare transit routes, travel times, and estimated fare prices side-by-side
-            </p>
-          </div>
+      {/* 1. Header */}
+      <div className="flex items-center gap-3.5 border-b border-slate-100 dark:border-slate-800/80 pb-5">
+        <div className="w-11 h-11 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-600 dark:text-sky-400 font-bold text-xl">
+          ✈️
+        </div>
+        <div>
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+            Transit & Connectivity Hub
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+            Compare transit routes, travel times, and estimated fare prices side by side
+          </p>
         </div>
       </div>
 
-      {/* Origin & Destination Control Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+      {/* 2. Source and Target Input Controls */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         
-        {/* Origin Searchable Dropdown */}
-        <div className="sm:col-span-5 space-y-1.5 relative" ref={originRef}>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-            <FiSend className="text-sky-500" />
-            <span>Starting From (City in India)</span>
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              value={origin}
-              onFocus={() => setShowOriginDropdown(true)}
-              onChange={(e) => {
-                setOrigin(e.target.value);
-                setShowOriginDropdown(true);
-              }}
-              placeholder="Search origin city..."
-              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
-            />
+        {/* Source City Autocomplete Input */}
+        <div ref={sourceRef} className="relative">
+          <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800 rounded-2xl p-3 focus-within:border-sky-500/60 transition-all">
+            <label className="block text-[9px] font-black uppercase text-sky-600 dark:text-sky-400 tracking-wider mb-1">
+              📍 STARTING FROM (CITY IN INDIA)
+            </label>
+            <div className="flex items-center justify-between">
+              <input
+                type="text"
+                value={sourceInput}
+                onFocus={() => setShowSourceDropdown(true)}
+                onChange={(e) => {
+                  setSourceInput(e.target.value);
+                  setShowSourceDropdown(true);
+                }}
+                placeholder="Type source city (e.g. Pune, Delhi)..."
+                className="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none"
+              />
+              <span className="text-sky-500 dark:text-sky-400 text-xs">🚗</span>
+            </div>
           </div>
 
-          {/* AUTOCOMPLETE ORIGIN DROPDOWN */}
-          {showOriginDropdown && (
-            <div className="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/80">
-              {filteredOrigins.length === 0 ? (
-                <div className="p-3 text-center text-xs text-slate-400 font-semibold">
-                  No predefined city found. You can keep typing custom city names!
-                </div>
-              ) : (
-                filteredOrigins.map((cityName, i) => (
-                  <div
-                    key={i}
-                    onClick={() => handleSelectOrigin(cityName)}
-                    className="p-3 hover:bg-sky-50 dark:hover:bg-sky-950/50 cursor-pointer flex items-center gap-2.5 text-xs font-bold text-slate-800 dark:text-slate-200 transition-colors"
-                  >
-                    <FiMapPin className="text-sky-500 text-sm flex-shrink-0" />
-                    <span>{cityName}</span>
+          {/* Source Autocomplete Suggestions Menu */}
+          {showSourceDropdown && sourceSuggestions.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#0b1220] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-56 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
+              {sourceSuggestions.map((city) => (
+                <div
+                  key={city.name}
+                  onClick={() => {
+                    const fullName = `${city.name}, ${city.state}`;
+                    setSourceInput(fullName);
+                    setSelectedSource(city);
+                    setShowSourceDropdown(false);
+                  }}
+                  className="p-3 flex items-center justify-between hover:bg-slate-100 dark:hover:bg-[#0f192d] cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-sky-500 dark:text-sky-400 text-xs">📍</span>
+                    <span className="text-xs font-black text-slate-900 dark:text-white">{city.name}</span>
                   </div>
-                ))
-              )}
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{city.state}</span>
+                </div>
+              ))}
             </div>
           )}
         </div>
 
-        {/* Target Destination Selector */}
-        <div className="sm:col-span-7 space-y-1.5">
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-            <FiMapPin className="text-teal-500" />
-            <span>Target Destination</span>
+        {/* Target Destination Dropdown */}
+        <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800 rounded-2xl p-3 focus-within:border-sky-500/60 transition-all">
+          <label className="block text-[9px] font-black uppercase text-sky-600 dark:text-sky-400 tracking-wider mb-1">
+            🎯 TARGET DESTINATION
           </label>
           <select
             value={selectedDestId}
             onChange={(e) => setSelectedDestId(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+            className="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-white focus:outline-none cursor-pointer appearance-none"
           >
-            {DESTINATIONS.map((d) => (
-              <option key={d.id} value={d.id} className="bg-white dark:bg-slate-900">
-                {d.name} ({d.type})
+            {DESTINATIONS.map((dest) => (
+              <option key={dest.id} value={dest.id} className="bg-white dark:bg-[#0b1220] text-slate-900 dark:text-white">
+                {dest.name}, {dest.state} ({dest.code})
               </option>
             ))}
           </select>
@@ -171,57 +226,123 @@ export default function ConnectivityHub() {
 
       </div>
 
-      {/* Distance Summary Banner */}
-      <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
-        <span className="font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-2">
-          <FiCompass className="text-sky-500 text-base" />
-          <span>Approximate Distance ({origin.split(",")[0]} ➔ {dest.name.split(",")[0]}):</span>
-        </span>
-        <span className="font-black text-slate-900 dark:text-white px-3 py-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          {currentRoute.dist}
+      {/* 3. Distance Banner */}
+      <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-xs font-extrabold text-slate-700 dark:text-slate-300">
+          <span className="text-sky-500 dark:text-sky-400">🧭</span>
+          <span>Approximate Distance ({sourceInput.split(",")[0]} ➔ {activeDest.name}):</span>
+        </div>
+        <span className="px-3 py-1 bg-sky-500/10 border border-sky-500/30 text-sky-700 dark:text-sky-300 text-xs font-black rounded-xl">
+          {activeDest.distance}
         </span>
       </div>
 
-      {/* Transit Modes Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {transitOptions.map((opt, idx) => (
-          <div
-            key={idx}
-            className="p-5 bg-slate-50 dark:bg-slate-950 rounded-3xl border border-slate-200 dark:border-slate-800/80 hover:border-sky-500/40 transition-all flex flex-col justify-between space-y-4"
-          >
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h4 className="text-base font-extrabold text-slate-900 dark:text-white">
-                  {opt.type}
-                </h4>
-                <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border ${opt.color}`}>
-                  {opt.badge}
-                </span>
-              </div>
-
-              <div className="space-y-1.5 pt-1 text-xs">
-                <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                  <FiClock className="text-sky-500 flex-shrink-0" />
-                  <span>Est. Duration: <strong>{opt.duration}</strong></span>
-                </div>
-                <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                  <FiDollarSign className="text-emerald-500 flex-shrink-0" />
-                  <span>Avg. One-Way Fare: <strong className="text-emerald-600 dark:text-emerald-400">{opt.cost}</strong></span>
-                </div>
-              </div>
-            </div>
-
-            <a
-              href={`https://www.google.com/search?q=${encodeURIComponent(`book ${opt.type.split(" ")[0]} from ${origin} to ${dest.name}`)}`}
-              target="_blank"
-              rel="noreferrer"
-              className="w-full py-2.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-sky-500 hover:text-slate-950 dark:hover:bg-sky-500 dark:hover:text-slate-950 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center justify-center gap-2 transition-colors border border-slate-200 dark:border-slate-800 shadow-sm cursor-pointer"
-            >
-              <span>Check Live Tickets</span>
-              <FiExternalLink className="text-xs" />
-            </a>
+      {/* 4. LIVE ROUTE MAP VISUALIZATION (Overflow hidden to clip floating card) */}
+      <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-2xl space-y-3 p-4">
+        <div className="flex items-center justify-between px-2">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse inline-block" />
+            <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+              Route Visualization Map ({sourceInput.split(",")[0]} ➔ {activeDest.name})
+            </h3>
           </div>
-        ))}
+          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Google Maps Live Directions</span>
+        </div>
+
+        <div className="relative w-full h-72 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800/80 bg-slate-950">
+          {/* Overlay mask to hide the floating directions list popup */}
+          <div className="absolute top-0 left-0 w-64 h-32 pointer-events-none z-10 bg-gradient-to-br from-slate-950/80 to-transparent sm:block hidden" />
+          <iframe
+            title="Transit Route Map"
+            src={mapUrl}
+            width="100%"
+            height="100%"
+            style={{ border: 0, filter: "invert(90%) hue-rotate(180deg) contrast(120%)" }}
+            allowFullScreen=""
+            loading="lazy"
+          />
+        </div>
+      </div>
+
+      {/* 5. Transit Comparison Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        
+        {/* Flight Option */}
+        <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 space-y-4 hover:border-sky-500/40 transition-all">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+              Flight ✈️
+            </h3>
+            <span className="px-2.5 py-1 bg-sky-500/10 border border-sky-500/30 text-sky-600 dark:text-sky-400 text-[10px] font-black rounded-lg uppercase tracking-wider">
+              FASTEST
+            </span>
+          </div>
+          <div className="space-y-1 text-xs">
+            <p className="text-slate-500 dark:text-slate-400">⏱️ Est. Duration: <strong className="text-slate-900 dark:text-white">{activeDest.flightDur}</strong></p>
+            <p className="text-slate-500 dark:text-slate-400">💵 Avg. One-Way Fare: <strong className="text-teal-600 dark:text-teal-400">₹{activeDest.flightFare}</strong></p>
+          </div>
+          <button className="w-full py-2.5 bg-white dark:bg-[#0b1220] hover:bg-sky-500/20 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2">
+            Check Live Tickets ↗
+          </button>
+        </div>
+
+        {/* Train Option */}
+        <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 space-y-4 hover:border-amber-500/40 transition-all">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+              Train 🚆
+            </h3>
+            <span className="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-black rounded-lg uppercase tracking-wider">
+              SCENIC & BUDGET
+            </span>
+          </div>
+          <div className="space-y-1 text-xs">
+            <p className="text-slate-500 dark:text-slate-400">⏱️ Est. Duration: <strong className="text-slate-900 dark:text-white">{activeDest.trainDur}</strong></p>
+            <p className="text-slate-500 dark:text-slate-400">💵 Avg. One-Way Fare: <strong className="text-teal-600 dark:text-teal-400">₹{activeDest.trainFare}</strong></p>
+          </div>
+          <button className="w-full py-2.5 bg-white dark:bg-[#0b1220] hover:bg-amber-500/20 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2">
+            Check Live Tickets ↗
+          </button>
+        </div>
+
+        {/* Bus Option */}
+        <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 space-y-4 hover:border-purple-500/40 transition-all">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+              Intercity Bus 🚌
+            </h3>
+            <span className="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[10px] font-black rounded-lg uppercase tracking-wider">
+              OVERNIGHT
+            </span>
+          </div>
+          <div className="space-y-1 text-xs">
+            <p className="text-slate-500 dark:text-slate-400">⏱️ Est. Duration: <strong className="text-slate-900 dark:text-white">{activeDest.busDur}</strong></p>
+            <p className="text-slate-500 dark:text-slate-400">💵 Avg. One-Way Fare: <strong className="text-teal-600 dark:text-teal-400">₹{activeDest.busFare}</strong></p>
+          </div>
+          <button className="w-full py-2.5 bg-white dark:bg-[#0b1220] hover:bg-purple-500/20 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2">
+            Check Live Tickets ↗
+          </button>
+        </div>
+
+        {/* Self-Drive / Taxi Option */}
+        <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 space-y-4 hover:border-rose-500/40 transition-all">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+              Self-Drive / Taxi 🚘
+            </h3>
+            <span className="px-2.5 py-1 bg-purple-500/10 border border-purple-500/30 text-purple-600 dark:text-purple-400 text-[10px] font-black rounded-lg uppercase tracking-wider">
+              FLEXIBLE ROADTRIP
+            </span>
+          </div>
+          <div className="space-y-1 text-xs">
+            <p className="text-slate-500 dark:text-slate-400">⏱️ Est. Duration: <strong className="text-slate-900 dark:text-white">{activeDest.driveDur}</strong></p>
+            <p className="text-slate-500 dark:text-slate-400">💵 Avg. One-Way Fare: <strong className="text-teal-600 dark:text-teal-400">₹{activeDest.driveFare}</strong></p>
+          </div>
+          <button className="w-full py-2.5 bg-white dark:bg-[#0b1220] hover:bg-rose-500/20 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2">
+            Check Live Tickets ↗
+          </button>
+        </div>
+
       </div>
 
     </div>

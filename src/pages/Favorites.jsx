@@ -1,126 +1,135 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { DESTINATIONS } from "../data/destinations";
-import { FiHeart, FiTrash2, FiArrowRight, FiMapPin } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import WeatherBadge from "../components/common/WeatherBadge";
+import { FiTrash2, FiArrowRight, FiHeart } from "react-icons/fi";
+
+const INITIAL_FAVORITES = [
+  {
+    id: "goa",
+    name: "Goa",
+    category: "Beaches",
+    price: 1800,
+    image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80",
+    description: "Pristine beaches, Portuguese colonial heritage, spice plantations, and vibrant coastal culture."
+  },
+  {
+    id: "manali",
+    name: "Manali",
+    category: "Mountains",
+    price: 2500,
+    image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800&q=80",
+    description: "Snow capped Himalayan peaks, cedar forests, adventure sports, and ancient wooden temples."
+  }
+];
 
 export default function Favorites() {
-  // Initialize with default favorite destination IDs
-  const [favoriteIds, setFavoriteIds] = useState(["manali", "goa"]);
+  const [favorites, setFavorites] = useState(INITIAL_FAVORITES);
+  const navigate = useNavigate();
 
-  const favoriteDestinations = DESTINATIONS.filter((d) =>
-    favoriteIds.includes(d.id)
-  );
-
-  const handleRemove = (id) => {
-    setFavoriteIds(favoriteIds.filter((favId) => favId !== id));
+  const removeFavorite = (id) => {
+    setFavorites((prev) => prev.filter((item) => item.id !== id));
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 text-slate-900 dark:text-slate-100">
-      
-      {/* Header with High-Contrast Text */}
-      <div>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300 text-xs font-bold mb-2">
-          <FiHeart className="text-teal-600 dark:text-teal-400" />
-          <span>Bookmarked Escapes</span>
-        </div>
+    <div className="min-h-screen bg-slate-50 dark:bg-[#060a12] text-slate-900 dark:text-white pt-24 pb-20 px-4 sm:px-8 transition-colors duration-300">
+      <div className="max-w-7xl mx-auto space-y-8">
         
-        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
-          Your Favorite Destinations
-        </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Quickly access and build itineraries for the destinations you have bookmarked.
-        </p>
-      </div>
-
-      {/* Empty State */}
-      {favoriteDestinations.length === 0 ? (
-        <div className="p-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 max-w-md mx-auto">
-          <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto text-xl">
-            <FiHeart />
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">No Favorites Saved Yet</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Browse the explore page to bookmark destinations for easy access.
-            </p>
-          </div>
-          <Link
-            to="/explore"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs transition-all shadow-md shadow-teal-500/20"
-          >
-            <span>Explore Destinations</span>
-            <FiArrowRight />
-          </Link>
+        {/* Header */}
+        <div className="space-y-2">
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+            Your Favorite Destinations
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
+            Quickly access and build itineraries for the destinations you have bookmarked.
+          </p>
         </div>
-      ) : (
-        /* Favorites Grid */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {favoriteDestinations.map((dest) => (
-            <div
-              key={dest.id}
-              className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:border-teal-500/50 transition-all duration-300 flex flex-col justify-between group"
-            >
-              <div>
-                {/* Image Container with Badge & Trash Button */}
-                <div className="relative h-52 overflow-hidden bg-slate-100 dark:bg-slate-950">
+
+        {/* Favorites Grid */}
+        {favorites.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {favorites.map((dest) => (
+              <div
+                key={dest.id}
+                className="bg-white dark:bg-[#0b1220] border border-slate-200 dark:border-slate-800/90 rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between transition-all hover:border-teal-400/50"
+              >
+                {/* Image Header */}
+                <div className="relative h-52 overflow-hidden bg-slate-950">
                   <img
                     src={dest.image}
                     alt={dest.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover opacity-90"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
 
-                  {/* Weather Pill */}
-                  <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md px-3 py-1 rounded-full border border-slate-800 text-slate-200 text-[11px] font-semibold">
-                    🌤️ {dest.weather?.temp} ({dest.weather?.condition})
+                  {/* Weather Badge */}
+                  <div className="absolute top-3 left-3">
+                    <WeatherBadge destinationId={dest.id} />
                   </div>
 
-                  {/* Remove Button */}
+                  {/* Remove Favorite Button */}
                   <button
-                    onClick={() => handleRemove(dest.id)}
-                    className="absolute top-3 right-3 p-2 rounded-full bg-white/90 dark:bg-slate-950/90 hover:bg-rose-500 dark:hover:bg-rose-500 text-slate-700 dark:text-slate-200 hover:text-white dark:hover:text-white transition-colors cursor-pointer border border-slate-200 dark:border-slate-800 shadow-sm"
+                    type="button"
+                    onClick={() => removeFavorite(dest.id)}
+                    className="absolute top-3 right-3 w-9 h-9 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-700 flex items-center justify-center text-rose-400 hover:bg-rose-500 hover:text-white transition-all cursor-pointer shadow-lg"
                     title="Remove from favorites"
                   >
-                    <FiTrash2 className="text-xs" />
+                    <FiTrash2 className="text-sm" />
                   </button>
+
+                  {/* Price Tag */}
+                  <div className="absolute bottom-3 right-4 text-xs font-black text-white bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-xl border border-slate-700">
+                    ₹{dest.price.toLocaleString()} / day
+                  </div>
                 </div>
 
                 {/* Card Content */}
-                <div className="p-6 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-teal-600 dark:text-teal-400">
-                      {dest.type}
+                <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-teal-600 dark:text-teal-400">
+                      {dest.category}
                     </span>
-                    <span className="text-xs font-black text-slate-900 dark:text-white">
-                      ₹{dest.costPerDay} <span className="font-normal text-slate-500 dark:text-slate-400">/ day</span>
-                    </span>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                      {dest.name}
+                    </h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                      {dest.description}
+                    </p>
                   </div>
 
-                  <h3 className="text-lg font-extrabold text-slate-900 dark:text-white group-hover:text-teal-500 transition-colors">
-                    {dest.name}
-                  </h3>
-
-                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                    {dest.description}
-                  </p>
+                  {/* Action Button */}
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/planner?dest=${dest.id}`)}
+                    className="w-full py-3.5 bg-slate-100 dark:bg-[#070b14] hover:bg-teal-400 hover:text-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-black text-xs rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
+                  >
+                    <span>Build Itinerary</span>
+                    <FiArrowRight />
+                  </button>
                 </div>
               </div>
-
-              {/* Action Button */}
-              <div className="p-6 pt-0">
-                <Link
-                  to="/planner"
-                  className="w-full py-3 rounded-2xl bg-slate-100 dark:bg-slate-800/80 hover:bg-teal-500 hover:text-slate-950 dark:hover:bg-teal-500 dark:hover:text-slate-950 text-slate-900 dark:text-slate-100 text-xs font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer border border-slate-200 dark:border-slate-700/60"
-                >
-                  <span>Build Itinerary</span>
-                  <FiArrowRight />
-                </Link>
-              </div>
+            ))}
+          </div>
+        ) : (
+          /* Empty State */
+          <div className="bg-white dark:bg-[#0b1220]/40 border border-dashed border-slate-300 dark:border-slate-800 rounded-3xl p-16 text-center space-y-3 transition-colors">
+            <div className="w-14 h-14 rounded-2xl bg-teal-500/10 border border-teal-500/20 text-teal-600 dark:text-teal-400 text-2xl flex items-center justify-center mx-auto">
+              <FiHeart />
             </div>
-          ))}
-        </div>
-      )}
+            <h3 className="text-lg font-black text-slate-900 dark:text-white">No Favorite Destinations Yet</h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+              Explore destinations and bookmark your top spots to access them quickly here.
+            </p>
+            <button
+              type="button"
+              onClick={() => navigate("/explore")}
+              className="mt-4 px-6 py-3 bg-teal-400 hover:bg-teal-300 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all cursor-pointer inline-flex items-center gap-2"
+            >
+              Explore Map <FiArrowRight />
+            </button>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }

@@ -1,166 +1,307 @@
-import React, { useState } from "react";
-import { DESTINATIONS } from "../data/destinations";
-import { FiColumns, FiCheck, FiX, FiSun, FiUsers, FiDollarSign, FiStar } from "react-icons/fi";
+import React, { useState, useRef, useEffect } from "react";
+import { FiChevronDown, FiAlertCircle } from "react-icons/fi";
+
+const DESTINATION_OPTIONS = [
+  {
+    id: "manali",
+    name: "Manali",
+    category: "Mountains",
+    image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800&q=80",
+    weather: "4°C (Snowy)",
+    budget: "₹2500 / day",
+    crowd: "Normal",
+    rating: "4.8 / 5.0",
+    bestTime: "October to February",
+    attractions: ["Solang Valley", "Rohtang Pass", "Hadimba Temple", "Old Manali"]
+  },
+  {
+    id: "goa",
+    name: "Goa",
+    category: "Beaches",
+    image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80",
+    weather: "28°C (Sunny)",
+    budget: "₹1800 / day",
+    crowd: "Busy",
+    rating: "4.6 / 5.0",
+    bestTime: "November to March",
+    attractions: ["Baga Beach", "Calangute Beach", "Dudhsagar Falls", "Fort Aguada"]
+  },
+  {
+    id: "jaipur",
+    name: "Jaipur",
+    category: "Heritage",
+    image: "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=800&q=80",
+    weather: "22°C (Pleasant)",
+    budget: "₹2200 / day",
+    crowd: "Overcrowded",
+    rating: "4.7 / 5.0",
+    bestTime: "November to February",
+    attractions: ["Amer Fort", "Hawa Mahal", "City Palace", "Jal Mahal"]
+  },
+  {
+    id: "bali",
+    name: "Bali",
+    category: "Beaches",
+    image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80",
+    weather: "30°C (Sunny)",
+    budget: "₹4500 / day",
+    crowd: "Busy",
+    rating: "4.9 / 5.0",
+    bestTime: "April to October",
+    attractions: ["Ubud Monkey Forest", "Tanah Lot Temple", "Mount Batur", "Seminyak Beach"]
+  },
+  {
+    id: "paris",
+    name: "Paris",
+    category: "Heritage",
+    image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80",
+    weather: "19°C (Pleasant)",
+    budget: "₹9500 / day",
+    crowd: "Overcrowded",
+    rating: "4.7 / 5.0",
+    bestTime: "June to August",
+    attractions: ["Eiffel Tower", "Louvre Museum", "Notre-Dame", "Montmartre"]
+  }
+];
 
 export default function Compare() {
-  const [selectedDest1, setSelectedDest1] = useState("manali");
-  const [selectedDest2, setSelectedDest2] = useState("goa");
+  const [destA, setDestA] = useState("manali");
+  const [destB, setDestB] = useState("goa");
+  const [error, setError] = useState("");
 
-  const dest1 = DESTINATIONS.find((d) => d.id === selectedDest1) || DESTINATIONS[0];
-  const dest2 = DESTINATIONS.find((d) => d.id === selectedDest2) || DESTINATIONS[1];
+  const [isOpenA, setIsOpenA] = useState(false);
+  const [isOpenB, setIsOpenB] = useState(false);
+
+  const dropdownRefA = useRef(null);
+  const dropdownRefB = useRef(null);
+
+  // Close custom dropdowns on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRefA.current && !dropdownRefA.current.contains(event.target)) setIsOpenA(false);
+      if (dropdownRefB.current && !dropdownRefB.current.contains(event.target)) setIsOpenB(false);
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const itemA = DESTINATION_OPTIONS.find((d) => d.id === destA);
+  const itemB = DESTINATION_OPTIONS.find((d) => d.id === destB);
+
+  const handleSelectA = (id) => {
+    if (id === destB) {
+      setError("Cannot compare the same destination. Please choose a different location.");
+    } else {
+      setError("");
+    }
+    setDestA(id);
+    setIsOpenA(false);
+  };
+
+  const handleSelectB = (id) => {
+    if (id === destA) {
+      setError("Cannot compare the same destination. Please choose a different location.");
+    } else {
+      setError("");
+    }
+    setDestB(id);
+    setIsOpenB(false);
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 text-slate-900 dark:text-slate-100">
-      
-      {/* Header */}
-      <div>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300 text-xs font-bold mb-2">
-          <FiColumns className="text-teal-600 dark:text-teal-400" />
-          <span>Side-by-Side Analysis Engine</span>
-        </div>
+    <div className="min-h-screen bg-slate-50 dark:bg-[#060a12] text-slate-900 dark:text-white pt-28 pb-20 px-4 sm:px-8 transition-colors duration-300">
+      <div className="max-w-7xl mx-auto space-y-8">
         
-        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
-          Compare Destinations
-        </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Evaluate weather, estimated daily budgets, crowd levels, and top attractions side-by-side[cite: 2].
-        </p>
-      </div>
-
-      {/* Selectors Header */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Selector 1 */}
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Select Destination A</label>
-          <select
-            value={selectedDest1}
-            onChange={(e) => setSelectedDest1(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer"
-          >
-            {DESTINATIONS.map((d) => (
-              <option key={d.id} value={d.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
-                {d.name} ({d.type})
-              </option>
-            ))}
-          </select>
+        {/* Header */}
+        <div className="space-y-2">
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+            Compare Destinations
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
+            Evaluate weather, estimated daily budgets, crowd levels, and top attractions side-by-side.
+          </p>
         </div>
 
-        {/* Selector 2 */}
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Select Destination B</label>
-          <select
-            value={selectedDest2}
-            onChange={(e) => setSelectedDest2(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer"
-          >
-            {DESTINATIONS.map((d) => (
-              <option key={d.id} value={d.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
-                {d.name} ({d.type})
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+        {/* Custom Dropdowns & Error Section */}
+        <div className="bg-white dark:bg-[#0b1220] border border-slate-200 dark:border-slate-800/95 rounded-3xl p-6 shadow-xl space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+            
+            {/* Dropdown A */}
+            <div className="space-y-2 relative" ref={dropdownRefA}>
+              <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                Select Destination A
+              </label>
+              <div
+                onClick={() => setIsOpenA(!isOpenA)}
+                className="w-full bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-3 text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between cursor-pointer shadow-sm hover:border-teal-500 transition-all"
+              >
+                <span>{itemA ? itemA.name : "Choose first destination..."}</span>
+                <FiChevronDown className={`transition-transform duration-200 ${isOpenA ? "rotate-180 text-teal-400" : "text-slate-400"}`} />
+              </div>
 
-      {/* Comparison Table View */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
-                <th className="p-4 text-xs font-bold uppercase tracking-wider text-slate-400 w-1/4">Feature</th>
-                <th className="p-4 text-xs font-extrabold uppercase tracking-wider text-teal-600 dark:text-teal-400 w-3/8">{dest1.name}</th>
-                <th className="p-4 text-xs font-extrabold uppercase tracking-wider text-teal-600 dark:text-teal-400 w-3/8">{dest2.name}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+              {isOpenA && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#0e1626] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden py-1">
+                  {DESTINATION_OPTIONS.map((d) => (
+                    <div
+                      key={d.id}
+                      onClick={() => handleSelectA(d.id)}
+                      className={`px-4 py-2.5 text-xs font-semibold cursor-pointer transition-colors flex items-center justify-between ${
+                        destA === d.id
+                          ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold"
+                          : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#162238]"
+                      }`}
+                    >
+                      <span>{d.name}</span>
+                      <span className="text-[10px] uppercase text-slate-400">{d.category}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Dropdown B */}
+            <div className="space-y-2 relative" ref={dropdownRefB}>
+              <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                Select Destination B
+              </label>
+              <div
+                onClick={() => setIsOpenB(!isOpenB)}
+                className="w-full bg-slate-50 dark:bg-[#070b14] border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-3 text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between cursor-pointer shadow-sm hover:border-teal-500 transition-all"
+              >
+                <span>{itemB ? itemB.name : "Choose second destination..."}</span>
+                <FiChevronDown className={`transition-transform duration-200 ${isOpenB ? "rotate-180 text-teal-400" : "text-slate-400"}`} />
+              </div>
+
+              {isOpenB && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#0e1626] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden py-1">
+                  {DESTINATION_OPTIONS.map((d) => (
+                    <div
+                      key={d.id}
+                      onClick={() => handleSelectB(d.id)}
+                      className={`px-4 py-2.5 text-xs font-semibold cursor-pointer transition-colors flex items-center justify-between ${
+                        destB === d.id
+                          ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold"
+                          : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#162238]"
+                      }`}
+                    >
+                      <span>{d.name}</span>
+                      <span className="text-[10px] uppercase text-slate-400">{d.category}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="flex items-center gap-2 p-3 bg-rose-500/10 border border-rose-500/20 text-rose-500 rounded-xl text-xs font-bold">
+              <FiAlertCircle className="text-base shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Side-by-Side Comparison Table Card */}
+        {itemA && itemB && !error ? (
+          <div className="bg-white dark:bg-[#0b1220] border border-slate-200 dark:border-slate-800/90 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-8">
+            
+            {/* Preview Images & Titles */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[itemA, itemB].map((item, idx) => (
+                <div key={idx} className="space-y-3">
+                  <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                    {idx === 0 ? "Preview A" : "Preview B"}
+                  </div>
+                  <div className="h-48 sm:h-56 rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800">
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                  </div>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white">{item.name}</h3>
+                </div>
+              ))}
+            </div>
+
+            <hr className="border-slate-200 dark:border-slate-800" />
+
+            {/* Comparison Rows */}
+            <div className="space-y-6 text-xs sm:text-sm">
               
-              {/* Preview Image */}
-              <tr>
-                <td className="p-4 font-bold text-slate-500 dark:text-slate-400">Preview</td>
-                <td className="p-4">
-                  <img src={dest1.image} alt={dest1.name} className="w-full h-32 sm:h-40 object-cover rounded-2xl border border-slate-200 dark:border-slate-800" />
-                </td>
-                <td className="p-4">
-                  <img src={dest2.image} alt={dest2.name} className="w-full h-32 sm:h-40 object-cover rounded-2xl border border-slate-200 dark:border-slate-800" />
-                </td>
-              </tr>
+              <div className="grid grid-cols-3 items-center py-3 border-b border-slate-100 dark:border-slate-800/60">
+                <span className="font-bold text-slate-400 uppercase text-[10px]">Category</span>
+                <span className="font-black text-slate-900 dark:text-white">{itemA.category}</span>
+                <span className="font-black text-slate-900 dark:text-white">{itemB.category}</span>
+              </div>
 
-              {/* Category */}
-              <tr>
-                <td className="p-4 font-bold text-slate-500 dark:text-slate-400">Category</td>
-                <td className="p-4 font-bold text-slate-900 dark:text-white">{dest1.type}</td>
-                <td className="p-4 font-bold text-slate-900 dark:text-white">{dest2.type}</td>
-              </tr>
+              <div className="grid grid-cols-3 items-center py-3 border-b border-slate-100 dark:border-slate-800/60">
+                <span className="font-bold text-slate-400 uppercase text-[10px]">Live Weather</span>
+                <span className="font-black text-amber-600 dark:text-amber-400">🌤️ {itemA.weather}</span>
+                <span className="font-black text-amber-600 dark:text-amber-400">🌤️ {itemB.weather}</span>
+              </div>
 
-              {/* Live Weather */}
-              <tr>
-                <td className="p-4 font-bold text-slate-500 dark:text-slate-400">Live Weather</td>
-                <td className="p-4">🌤️ {dest1.weather?.temp} ({dest1.weather?.condition})</td>
-                <td className="p-4">🌤️ {dest2.weather?.temp} ({dest2.weather?.condition})</td>
-              </tr>
+              <div className="grid grid-cols-3 items-center py-3 border-b border-slate-100 dark:border-slate-800/60">
+                <span className="font-bold text-slate-400 uppercase text-[10px]">Est. Daily Budget</span>
+                <span className="font-black text-teal-600 dark:text-teal-400">{itemA.budget}</span>
+                <span className="font-black text-teal-600 dark:text-teal-400">{itemB.budget}</span>
+              </div>
 
-              {/* Budget */}
-              <tr>
-                <td className="p-4 font-bold text-slate-500 dark:text-slate-400">Est. Daily Budget</td>
-                <td className="p-4 font-black text-teal-600 dark:text-teal-400">₹{dest1.costPerDay} / day</td>
-                <td className="p-4 font-black text-teal-600 dark:text-teal-400">₹{dest2.costPerDay} / day</td>
-              </tr>
-
-              {/* Traffic Level */}
-              <tr>
-                <td className="p-4 font-bold text-slate-500 dark:text-slate-400">Traffic / Crowd Level</td>
-                <td className="p-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold text-white ${
-                    dest1.trafficStatus === "Overcrowded" ? "bg-rose-500" : dest1.trafficStatus === "Busy" ? "bg-amber-500" : "bg-emerald-500"
+              <div className="grid grid-cols-3 items-center py-3 border-b border-slate-100 dark:border-slate-800/60">
+                <span className="font-bold text-slate-400 uppercase text-[10px]">Traffic / Crowd Level</span>
+                <div>
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
+                    itemA.crowd === "Normal" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
+                    itemA.crowd === "Busy" ? "bg-amber-500/10 text-amber-500 border border-amber-500/20" :
+                    "bg-rose-500/10 text-rose-500 border border-rose-500/20"
                   }`}>
-                    {dest1.trafficStatus}
+                    {itemA.crowd}
                   </span>
-                </td>
-                <td className="p-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold text-white ${
-                    dest2.trafficStatus === "Overcrowded" ? "bg-rose-500" : dest2.trafficStatus === "Busy" ? "bg-amber-500" : "bg-emerald-500"
+                </div>
+                <div>
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
+                    itemB.crowd === "Normal" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
+                    itemB.crowd === "Busy" ? "bg-amber-500/10 text-amber-500 border border-amber-500/20" :
+                    "bg-rose-500/10 text-rose-500 border border-rose-500/20"
                   }`}>
-                    {dest2.trafficStatus}
+                    {itemB.crowd}
                   </span>
-                </td>
-              </tr>
+                </div>
+              </div>
 
-              {/* User Rating */}
-              <tr>
-                <td className="p-4 font-bold text-slate-500 dark:text-slate-400">User Rating</td>
-                <td className="p-4 font-bold text-amber-500">★ {dest1.rating} / 5.0</td>
-                <td className="p-4 font-bold text-amber-500">★ {dest2.rating} / 5.0</td>
-              </tr>
+              <div className="grid grid-cols-3 items-center py-3 border-b border-slate-100 dark:border-slate-800/60">
+                <span className="font-bold text-slate-400 uppercase text-[10px]">User Rating</span>
+                <span className="font-black text-amber-500">★ {itemA.rating}</span>
+                <span className="font-black text-amber-500">★ {itemB.rating}</span>
+              </div>
 
-              {/* Top Attractions */}
-              <tr>
-                <td className="p-4 font-bold text-slate-500 dark:text-slate-400">Top Attractions</td>
-                <td className="p-4">
-                  <ul className="space-y-1">
-                    {dest1.attractions?.map((a, i) => (
-                      <li key={i} className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300">
-                        <FiCheck className="text-teal-500 flex-shrink-0" />
-                        <span>{a}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </td>
-                <td className="p-4">
-                  <ul className="space-y-1">
-                    {dest2.attractions?.map((a, i) => (
-                      <li key={i} className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300">
-                        <FiCheck className="text-teal-500 flex-shrink-0" />
-                        <span>{a}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </td>
-              </tr>
+              <div className="grid grid-cols-3 items-center py-3 border-b border-slate-100 dark:border-slate-800/60">
+                <span className="font-bold text-slate-400 uppercase text-[10px]">Best Time to Visit</span>
+                <span className="font-semibold text-slate-700 dark:text-slate-300">{itemA.bestTime}</span>
+                <span className="font-semibold text-slate-700 dark:text-slate-300">{itemB.bestTime}</span>
+              </div>
 
-            </tbody>
-          </table>
-        </div>
+              <div className="grid grid-cols-3 items-start py-3">
+                <span className="font-bold text-slate-400 uppercase text-[10px] pt-1">Top Attractions</span>
+                <ul className="space-y-1.5 font-semibold text-slate-700 dark:text-slate-300">
+                  {itemA.attractions.map((attr, i) => (
+                    <li key={i} className="flex items-center gap-1.5">
+                      <span className="text-teal-500">✓</span> {attr}
+                    </li>
+                  ))}
+                </ul>
+                <ul className="space-y-1.5 font-semibold text-slate-700 dark:text-slate-300">
+                  {itemB.attractions.map((attr, i) => (
+                    <li key={i} className="flex items-center gap-1.5">
+                      <span className="text-teal-500">✓</span> {attr}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+            </div>
+
+          </div>
+        ) : null}
+
       </div>
     </div>
   );

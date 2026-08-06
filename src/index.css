@@ -1,3 +1,34 @@
 @import "tailwindcss";
-@import "leaflet/dist/leaflet.css";
+
 @variant dark (&:where(.dark, .dark *));
+
+/* Force background and text colors globally based on the html.dark class */
+html {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+html.dark {
+  background-color: #060a12 !important;
+  color: #f8fafc !important;
+}
+
+body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: transparent;
+}
+
+/* Luxury scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(20, 184, 166, 0.3);
+  border-radius: 9999px;
+}
