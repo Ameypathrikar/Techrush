@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiCompass, FiCoffee } from "react-icons/fi";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -39,7 +39,9 @@ const ALL_DESTINATIONS = [
     lat: 15.2993,
     lng: 74.124,
     image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80",
-    description: "Pristine beaches, Portuguese colonial heritage, and vibrant coastal culture."
+    description: "Pristine beaches, Portuguese colonial heritage, and vibrant coastal culture.",
+    spots: "Baga Beach, Fort Aguada, Dudhsagar Falls",
+    food: "Goan Fish Curry, Bebinca, Xacuti"
   },
   {
     id: "manali",
@@ -53,7 +55,9 @@ const ALL_DESTINATIONS = [
     lat: 32.2432,
     lng: 77.1892,
     image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=600&q=80",
-    description: "Snow-capped Himalayan peaks, cedar forests, and ancient wooden temples."
+    description: "Snow-capped Himalayan peaks, cedar forests, and ancient wooden temples.",
+    spots: "Solang Valley, Rohtang Pass, Hadimba Temple",
+    food: "Siddu, Madra, Trout Fish"
   },
   {
     id: "jaipur",
@@ -67,7 +71,9 @@ const ALL_DESTINATIONS = [
     lat: 26.9124,
     lng: 75.7873,
     image: "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=600&q=80",
-    description: "Majestic hill forts, pink sandstone palaces, and vibrant royal culture."
+    description: "Majestic hill forts, pink sandstone palaces, and vibrant royal culture.",
+    spots: "Amber Fort, Hawa Mahal, City Palace",
+    food: "Dal Baati Churma, Pyaaz Kachori, Ghevar"
   },
   {
     id: "udaipur",
@@ -81,7 +87,9 @@ const ALL_DESTINATIONS = [
     lat: 24.5854,
     lng: 73.7125,
     image: "https://images.unsplash.com/photo-1615836245337-f5b9b2303f10?auto=format&fit=crop&w=600&q=80",
-    description: "Known as the City of Lakes, celebrated for lavish palaces and romantic boat cruises."
+    description: "Known as the City of Lakes, celebrated for lavish palaces and romantic boat cruises.",
+    spots: "Lake Pichola, City Palace, Jag Mandir",
+    food: "Gatte ki Sabzi, Ker Sangri, Mirchi Bada"
   },
   {
     id: "ladakh",
@@ -95,7 +103,9 @@ const ALL_DESTINATIONS = [
     lat: 34.1526,
     lng: 77.5771,
     image: "https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=600&q=80",
-    description: "High-desert landscape featuring pristine blue lakes, monasteries, and mountain passes."
+    description: "High-desert landscape featuring pristine blue lakes, monasteries, and mountain passes.",
+    spots: "Pangong Tso, Nubra Valley, Thiksey Monastery",
+    food: "Thukpa, Momos, Butter Tea"
   },
   {
     id: "munnar",
@@ -109,7 +119,9 @@ const ALL_DESTINATIONS = [
     lat: 10.0889,
     lng: 77.0595,
     image: "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=600&q=80",
-    description: "Serene hill station in the Western Ghats surrounded by rolling tea plantations."
+    description: "Serene hill station in the Western Ghats surrounded by rolling tea plantations.",
+    spots: "Eravikulam National Park, Mattupetty Dam, Tea Gardens",
+    food: "Kerala Sadya, Appam with Stew, Puttu"
   },
   {
     id: "varanasi",
@@ -123,7 +135,9 @@ const ALL_DESTINATIONS = [
     lat: 25.3176,
     lng: 82.9739,
     image: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=600&q=80",
-    description: "Spiritual capital of India featuring ancient river ghats and evening ceremonies."
+    description: "Spiritual capital of India featuring ancient river ghats and evening ceremonies.",
+    spots: "Dashashwamedh Ghat, Kashi Vishwanath, Sarnath",
+    food: "Banarasi Paan, Kachori Jalebi, Malaiyyo"
   },
   {
     id: "darjeeling",
@@ -137,7 +151,9 @@ const ALL_DESTINATIONS = [
     lat: 27.041,
     lng: 88.2663,
     image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80",
-    description: "Famous for its Darjeeling tea estates and panoramic Kanchenjunga sunrise views."
+    description: "Famous for its Darjeeling tea estates and panoramic Kanchenjunga sunrise views.",
+    spots: "Tiger Hill, Batasia Loop, Darjeeling Himalayan Railway",
+    food: "Momos, Thukpa, Churpee"
   },
   {
     id: "bali",
@@ -151,7 +167,9 @@ const ALL_DESTINATIONS = [
     lat: -8.3405,
     lng: 115.092,
     image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80",
-    description: "Tropical paradise renowned for volcanic mountains, cliffside temples, and beaches."
+    description: "Tropical paradise renowned for volcanic mountains, cliffside temples, and beaches.",
+    spots: "Ubud Monkey Forest, Uluwatu Temple, Seminyak Beach",
+    food: "Nasi Goreng, Babi Guling, Satay"
   },
   {
     id: "paris",
@@ -165,7 +183,9 @@ const ALL_DESTINATIONS = [
     lat: 48.8566,
     lng: 2.3522,
     image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&q=80",
-    description: "Global center for art, fashion, gastronomy, and culture featuring the Eiffel Tower."
+    description: "Global center for art, fashion, gastronomy, and culture featuring the Eiffel Tower.",
+    spots: "Eiffel Tower, Louvre Museum, Notre-Dame",
+    food: "Croissants, Macarons, Coq au Vin"
   },
   {
     id: "tokyo",
@@ -179,7 +199,9 @@ const ALL_DESTINATIONS = [
     lat: 35.6762,
     lng: 139.6503,
     image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=600&q=80",
-    description: "A bustling metropolis blending ultra-modern neon skyscrapers with historic temples."
+    description: "A bustling metropolis blending ultra-modern neon skyscrapers with historic temples.",
+    spots: "Senso-ji Temple, Shibuya Crossing, Tokyo Skytree",
+    food: "Sushi, Ramen, Tempura"
   }
 ];
 
@@ -306,7 +328,7 @@ export default function Explore() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
           {/* Map Section */}
-          <div className="lg:col-span-6 bg-white dark:bg-[#0e1626] border border-slate-200 dark:border-slate-800/80 rounded-3xl overflow-hidden h-[520px] relative shadow-md dark:shadow-2xl z-0 transition-colors">
+          <div className="lg:col-span-6 bg-white dark:bg-[#0e1626] border border-slate-200 dark:border-slate-800/80 rounded-3xl overflow-hidden h-[560px] relative shadow-md dark:shadow-2xl z-0 transition-colors">
             <MapContainer
               center={[20.5937, 78.9629]}
               zoom={5}
@@ -332,18 +354,24 @@ export default function Explore() {
                     }}
                   >
                     <Popup>
-                      <div className="w-52 overflow-hidden rounded-xl space-y-2 p-0.5">
+                      <div className="w-60 overflow-hidden rounded-xl space-y-2 p-0.5">
                         <img
                           src={dest.image}
                           alt={dest.name}
                           className="w-full h-28 object-cover rounded-lg shadow-sm"
                         />
-                        <div className="text-slate-900 space-y-1.5">
+                        <div className="text-slate-900 space-y-1">
                           <p className="font-black text-sm leading-tight m-0">{dest.name}</p>
                           <div className="flex justify-between items-center">
                             <span className="text-[10px] text-teal-700 uppercase font-black">{dest.category}</span>
                             <span className="text-[11px] font-extrabold bg-slate-100 px-2 py-0.5 rounded-md">₹{dest.price}/day</span>
                           </div>
+                          <p className="text-[10px] text-slate-600 font-medium pt-1 border-t border-slate-100">
+                            <strong>Spots:</strong> {dest.spots}
+                          </p>
+                          <p className="text-[10px] text-slate-600 font-medium">
+                            <strong>Food:</strong> {dest.food}
+                          </p>
                         </div>
                       </div>
                     </Popup>
@@ -353,8 +381,8 @@ export default function Explore() {
             </MapContainer>
           </div>
 
-          {/* List Section with Favorite Button Integration */}
-          <div className="lg:col-span-6 space-y-3 h-[520px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-800">
+          {/* List Section with Favorite Button Integration & Highlight Features */}
+          <div className="lg:col-span-6 space-y-3 h-[560px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-800">
             {filteredDestinations.length > 0 ? (
               filteredDestinations.map((item) => {
                 const isSelected = activeDest?.id === item.id;
@@ -362,14 +390,14 @@ export default function Explore() {
                   <div
                     key={item.id}
                     onClick={() => setActiveDest(item)}
-                    className={`border rounded-2xl p-3.5 flex items-center justify-between gap-4 transition-all duration-200 cursor-pointer shadow-md ${
+                    className={`border rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all duration-200 cursor-pointer shadow-md ${
                       isSelected
                         ? "bg-teal-50 dark:bg-[#16243f] border-teal-500 dark:border-teal-400 ring-1 ring-teal-500 dark:ring-teal-400"
                         : "bg-white dark:bg-[#0e1626] hover:bg-slate-100 dark:hover:bg-[#121c30] border-slate-200 dark:border-slate-800/80"
                     }`}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="relative w-20 h-20 shrink-0">
+                    <div className="flex items-start gap-4 w-full sm:w-auto">
+                      <div className="relative w-24 h-24 sm:w-20 sm:h-20 shrink-0">
                         <img
                           src={item.image}
                           alt={item.name}
@@ -379,10 +407,15 @@ export default function Explore() {
                           <FavoriteButton destination={item} />
                         </div>
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-black uppercase text-teal-600 dark:text-teal-400 tracking-wider">
-                          {item.category}
-                        </span>
+                      <div className="space-y-1 flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase text-teal-600 dark:text-teal-400 tracking-wider">
+                            {item.category}
+                          </span>
+                          <span className="sm:hidden text-xs font-black text-slate-900 dark:text-white">
+                            ₹{item.price}/day
+                          </span>
+                        </div>
                         <h3 className="text-sm font-black text-slate-900 dark:text-white leading-tight">
                           {item.name}
                         </h3>
@@ -393,10 +426,22 @@ export default function Explore() {
                             {item.crowd}
                           </span>
                         </div>
+                        
+                        {/* Popular Spots & Food Highlights */}
+                        <div className="pt-1.5 space-y-0.5 text-[11px] text-slate-600 dark:text-slate-300">
+                          <p className="flex items-center gap-1.5 truncate">
+                            <FiCompass className="text-teal-500 shrink-0 text-xs" />
+                            <span className="truncate"><strong>Spots:</strong> {item.spots}</span>
+                          </p>
+                          <p className="flex items-center gap-1.5 truncate">
+                            <FiCoffee className="text-amber-500 shrink-0 text-xs" />
+                            <span className="truncate"><strong>Food:</strong> {item.food}</span>
+                          </p>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="text-right shrink-0">
+                    <div className="hidden sm:block text-right shrink-0">
                       <span className="text-xs font-black text-slate-900 dark:text-white tracking-tight">
                         ₹{item.price}/day
                       </span>

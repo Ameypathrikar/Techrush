@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FiChevronDown, FiAlertCircle } from "react-icons/fi";
+import { FiChevronDown, FiAlertCircle, FiCompass } from "react-icons/fi";
 
 const DESTINATION_OPTIONS = [
   {
@@ -12,6 +12,7 @@ const DESTINATION_OPTIONS = [
     crowd: "Normal",
     rating: "4.8 / 5.0",
     bestTime: "October to February",
+    food: "Siddu, Madra, Trout Fish, Hot Thukpa",
     attractions: ["Solang Valley", "Rohtang Pass", "Hadimba Temple", "Old Manali"]
   },
   {
@@ -24,6 +25,7 @@ const DESTINATION_OPTIONS = [
     crowd: "Busy",
     rating: "4.6 / 5.0",
     bestTime: "November to March",
+    food: "Goan Fish Curry, Bebinca, Prawn Xacuti",
     attractions: ["Baga Beach", "Calangute Beach", "Dudhsagar Falls", "Fort Aguada"]
   },
   {
@@ -36,6 +38,7 @@ const DESTINATION_OPTIONS = [
     crowd: "Overcrowded",
     rating: "4.7 / 5.0",
     bestTime: "November to February",
+    food: "Dal Baati Churma, Pyaaz Kachori, Ghevar",
     attractions: ["Amer Fort", "Hawa Mahal", "City Palace", "Jal Mahal"]
   },
   {
@@ -48,6 +51,7 @@ const DESTINATION_OPTIONS = [
     crowd: "Busy",
     rating: "4.9 / 5.0",
     bestTime: "April to October",
+    food: "Nasi Goreng, Babi Guling, Chicken Satay",
     attractions: ["Ubud Monkey Forest", "Tanah Lot Temple", "Mount Batur", "Seminyak Beach"]
   },
   {
@@ -60,13 +64,14 @@ const DESTINATION_OPTIONS = [
     crowd: "Overcrowded",
     rating: "4.7 / 5.0",
     bestTime: "June to August",
+    food: "Croissants, Macarons, Coq au Vin, Escargot",
     attractions: ["Eiffel Tower", "Louvre Museum", "Notre-Dame", "Montmartre"]
   }
 ];
 
 export default function Compare() {
-  const [destA, setDestA] = useState("manali");
-  const [destB, setDestB] = useState("goa");
+  const [destA, setDestA] = useState(null);
+  const [destB, setDestB] = useState(null);
   const [error, setError] = useState("");
 
   const [isOpenA, setIsOpenA] = useState(false);
@@ -91,9 +96,9 @@ export default function Compare() {
   const handleSelectA = (id) => {
     if (id === destB) {
       setError("Cannot compare the same destination. Please choose a different location.");
-    } else {
-      setError("");
+      return;
     }
+    setError("");
     setDestA(id);
     setIsOpenA(false);
   };
@@ -101,9 +106,9 @@ export default function Compare() {
   const handleSelectB = (id) => {
     if (id === destA) {
       setError("Cannot compare the same destination. Please choose a different location.");
-    } else {
-      setError("");
+      return;
     }
+    setError("");
     setDestB(id);
     setIsOpenB(false);
   };
@@ -118,7 +123,7 @@ export default function Compare() {
             Compare Destinations
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
-            Evaluate weather, estimated daily budgets, crowd levels, and top attractions side-by-side.
+            Evaluate weather, estimated daily budgets, crowd levels, local cuisine, and top attractions side-by-side.
           </p>
         </div>
 
@@ -141,20 +146,27 @@ export default function Compare() {
 
               {isOpenA && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#0e1626] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden py-1">
-                  {DESTINATION_OPTIONS.map((d) => (
-                    <div
-                      key={d.id}
-                      onClick={() => handleSelectA(d.id)}
-                      className={`px-4 py-2.5 text-xs font-semibold cursor-pointer transition-colors flex items-center justify-between ${
-                        destA === d.id
-                          ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold"
-                          : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#162238]"
-                      }`}
-                    >
-                      <span>{d.name}</span>
-                      <span className="text-[10px] uppercase text-slate-400">{d.category}</span>
-                    </div>
-                  ))}
+                  {DESTINATION_OPTIONS.map((d) => {
+                    const isDisabled = d.id === destB;
+                    return (
+                      <div
+                        key={d.id}
+                        onClick={() => !isDisabled && handleSelectA(d.id)}
+                        className={`px-4 py-2.5 text-xs font-semibold flex items-center justify-between transition-colors ${
+                          isDisabled
+                            ? "opacity-40 cursor-not-allowed bg-slate-100 dark:bg-slate-900/50"
+                            : "cursor-pointer"
+                        } ${
+                          destA === d.id
+                            ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold"
+                            : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#162238]"
+                        }`}
+                      >
+                        <span>{d.name}</span>
+                        <span className="text-[10px] uppercase text-slate-400">{d.category}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -174,20 +186,27 @@ export default function Compare() {
 
               {isOpenB && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#0e1626] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden py-1">
-                  {DESTINATION_OPTIONS.map((d) => (
-                    <div
-                      key={d.id}
-                      onClick={() => handleSelectB(d.id)}
-                      className={`px-4 py-2.5 text-xs font-semibold cursor-pointer transition-colors flex items-center justify-between ${
-                        destB === d.id
-                          ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold"
-                          : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#162238]"
-                      }`}
-                    >
-                      <span>{d.name}</span>
-                      <span className="text-[10px] uppercase text-slate-400">{d.category}</span>
-                    </div>
-                  ))}
+                  {DESTINATION_OPTIONS.map((d) => {
+                    const isDisabled = d.id === destA;
+                    return (
+                      <div
+                        key={d.id}
+                        onClick={() => !isDisabled && handleSelectB(d.id)}
+                        className={`px-4 py-2.5 text-xs font-semibold flex items-center justify-between transition-colors ${
+                          isDisabled
+                            ? "opacity-40 cursor-not-allowed bg-slate-100 dark:bg-slate-900/50"
+                            : "cursor-pointer"
+                        } ${
+                          destB === d.id
+                            ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold"
+                            : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#162238]"
+                        }`}
+                      >
+                        <span>{d.name}</span>
+                        <span className="text-[10px] uppercase text-slate-400">{d.category}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -203,9 +222,24 @@ export default function Compare() {
           )}
         </div>
 
+        {/* Initial Empty State Prompt */}
+        {(!itemA || !itemB) && (
+          <div className="bg-white dark:bg-[#0b1220] border border-slate-200 dark:border-slate-800/90 rounded-3xl p-16 text-center space-y-4 shadow-xl">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-500 text-2xl font-bold">
+              <FiCompass />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-lg font-black text-slate-900 dark:text-white">Ready for Comparison</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium max-w-sm mx-auto">
+                Please select both Destination A and Destination B from the selectors above to view their side-by-side analysis.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Side-by-Side Comparison Table Card */}
         {itemA && itemB && !error ? (
-          <div className="bg-white dark:bg-[#0b1220] border border-slate-200 dark:border-slate-800/90 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-8">
+          <div className="bg-white dark:bg-[#0b1220] border border-slate-200 dark:border-slate-800/90 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-8 animate-in fade-in duration-300">
             
             {/* Preview Images & Titles */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -265,6 +299,13 @@ export default function Compare() {
                     {itemB.crowd}
                   </span>
                 </div>
+              </div>
+
+              {/* Added Local Food & Cuisine Row */}
+              <div className="grid grid-cols-3 items-center py-3 border-b border-slate-100 dark:border-slate-800/60">
+                <span className="font-bold text-slate-400 uppercase text-[10px]">Famous Local Food</span>
+                <span className="font-semibold text-slate-700 dark:text-slate-300">🍲 {itemA.food}</span>
+                <span className="font-semibold text-slate-700 dark:text-slate-300">🍲 {itemB.food}</span>
               </div>
 
               <div className="grid grid-cols-3 items-center py-3 border-b border-slate-100 dark:border-slate-800/60">

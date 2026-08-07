@@ -1,27 +1,52 @@
 import React, { useState } from "react";
 
+// Source Cities with Approximate Distances / Zones
+const SOURCE_CITIES = [
+  { name: "Pune", baseMultiplier: 1.0 },
+  { name: "Mumbai", baseMultiplier: 1.05 },
+  { name: "Delhi NCR", baseMultiplier: 1.2 },
+  { name: "Bangalore", baseMultiplier: 1.15 },
+  { name: "Hyderabad", baseMultiplier: 1.1 },
+  { name: "Chennai", baseMultiplier: 1.2 },
+  { name: "Kolkata", baseMultiplier: 1.3 }
+];
+
 const BUDGET_DESTINATIONS = [
-  { id: "manali", name: "Manali, Himachal Pradesh", basePrice: 2500 },
-  { id: "goa", name: "Goa Beaches", basePrice: 1800 },
-  { id: "jaipur", name: "Jaipur, Rajasthan", basePrice: 2200 },
-  { id: "udaipur", name: "Udaipur, Rajasthan", basePrice: 2600 },
-  { id: "darjeeling", name: "Darjeeling, West Bengal", basePrice: 2300 },
-  { id: "ladakh", name: "Leh Ladakh, J&K", basePrice: 4500 },
-  { id: "munnar", name: "Munnar, Kerala", basePrice: 2100 },
-  { id: "varanasi", name: "Varanasi, Uttar Pradesh", basePrice: 1400 }
+  { id: "manali", name: "Manali, Himachal Pradesh", basePrice: 4200, defaultDistFactor: 1.3 },
+  { id: "goa", name: "Goa Beaches", basePrice: 3500, defaultDistFactor: 1.0 },
+  { id: "jaipur", name: "Jaipur, Rajasthan", basePrice: 3200, defaultDistFactor: 1.1 },
+  { id: "udaipur", name: "Udaipur, Rajasthan", basePrice: 3800, defaultDistFactor: 1.1 },
+  { id: "darjeeling", name: "Darjeeling, West Bengal", basePrice: 3400, defaultDistFactor: 1.4 },
+  { id: "ladakh", name: "Leh Ladakh, J&K", basePrice: 6500, defaultDistFactor: 1.5 },
+  { id: "munnar", name: "Munnar, Kerala", basePrice: 3300, defaultDistFactor: 1.1 },
+  { id: "varanasi", name: "Varanasi, Uttar Pradesh", basePrice: 2500, defaultDistFactor: 1.2 }
+];
+
+const TRANSPORT_MODES = [
+  { id: "train", name: "Train 🚆", multiplier: 0.8 },
+  { id: "bus", name: "Bus 🚌", multiplier: 0.9 },
+  { id: "drive", name: "Self-Drive 🚘", multiplier: 1.2 },
+  { id: "flight", name: "Flight ✈️", multiplier: 1.6 }
 ];
 
 export default function BudgetCalculator() {
+  const [selectedSource, setSelectedSource] = useState("Pune");
   const [selectedDestId, setSelectedDestId] = useState("manali");
+  const [transportMode, setTransportMode] = useState("train");
   const [tier, setTier] = useState("Standard"); // Budget | Standard | Luxury
   const [days, setDays] = useState(3);
 
   const selectedDest =
     BUDGET_DESTINATIONS.find((d) => d.id === selectedDestId) || BUDGET_DESTINATIONS[0];
+  const sourceObj = SOURCE_CITIES.find((s) => s.name === selectedSource) || SOURCE_CITIES[0];
+  const transportObj = TRANSPORT_MODES.find((t) => t.id === transportMode) || TRANSPORT_MODES[0];
 
   // Tier Multiplier
-  const multiplier = tier === "Budget" ? 0.7 : tier === "Luxury" ? 1.8 : 1.0;
-  const dailyTotal = Math.round(selectedDest.basePrice * multiplier);
+  const tierMultiplier = tier === "Budget" ? 0.7 : tier === "Luxury" ? 1.8 : 1.0;
+  
+  // Dynamic calculation combining destination base price, source weighting, and transport mode weight
+  const calculatedBase = Math.round(selectedDest.basePrice * sourceObj.baseMultiplier * selectedDest.defaultDistFactor * transportObj.multiplier);
+  const dailyTotal = Math.round(calculatedBase * tierMultiplier);
 
   // Split percentages
   const stayCost = Math.round(dailyTotal * 0.45);
@@ -45,23 +70,41 @@ export default function BudgetCalculator() {
               Smart Destination Budget Engine
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-              Auto-calculated daily estimates tailored to real location pricing
+              Auto-calculated estimates via {transportObj.name} from {selectedSource} to {selectedDest.name.split(",")[0]}
             </p>
           </div>
         </div>
 
         <div className="px-3.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold flex items-center gap-2">
-          <span>🎚️</span> Auto Estimates
+          <span>🎚️</span> Route & Transit Aware
         </div>
       </div>
 
-      {/* 2. Top Control Panel: Destination, Travel Style Tier, Days */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+      {/* 2. Top Control Panel: Source, Destination, Transport, Tier, Days */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-4 items-center">
         
-        {/* Destination Dropdown */}
-        <div className="md:col-span-5 bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800 rounded-2xl p-3 focus-within:border-teal-500/60 transition-all">
+        {/* Source City Dropdown */}
+        <div className="md:col-span-3 bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800 rounded-2xl p-3 focus-within:border-teal-500/60 transition-all">
           <label className="block text-[9px] font-black uppercase text-teal-600 dark:text-teal-400 tracking-wider mb-1">
-            📍 SELECT DESTINATION
+            📍 STARTING FROM
+          </label>
+          <select
+            value={selectedSource}
+            onChange={(e) => setSelectedSource(e.target.value)}
+            className="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-white focus:outline-none cursor-pointer appearance-none"
+          >
+            {SOURCE_CITIES.map((src) => (
+              <option key={src.name} value={src.name} className="bg-white dark:bg-[#0b1220] text-slate-900 dark:text-white">
+                {src.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Destination Dropdown */}
+        <div className="md:col-span-3 bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800 rounded-2xl p-3 focus-within:border-teal-500/60 transition-all">
+          <label className="block text-[9px] font-black uppercase text-teal-600 dark:text-teal-400 tracking-wider mb-1">
+            🎯 TARGET DESTINATION
           </label>
           <select
             value={selectedDestId}
@@ -70,56 +113,32 @@ export default function BudgetCalculator() {
           >
             {BUDGET_DESTINATIONS.map((dest) => (
               <option key={dest.id} value={dest.id} className="bg-white dark:bg-[#0b1220] text-slate-900 dark:text-white">
-                {dest.name} (Base ~₹{dest.basePrice}/day)
+                {dest.name}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Travel Style Tier Toggle */}
-        <div className="md:col-span-5 bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800 rounded-2xl p-2 flex items-center justify-between">
-          <label className="block text-[9px] font-black uppercase text-teal-600 dark:text-teal-400 tracking-wider px-2">
-            ⚡ TRAVEL STYLE / TIER
+        {/* Mode of Transport Dropdown */}
+        <div className="md:col-span-3 bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800 rounded-2xl p-3 focus-within:border-teal-500/60 transition-all">
+          <label className="block text-[9px] font-black uppercase text-teal-600 dark:text-teal-400 tracking-wider mb-1">
+            🚀 MODE OF TRANSPORT
           </label>
-          <div className="flex items-center gap-1 bg-white dark:bg-[#0b1220] p-1 rounded-xl border border-slate-200 dark:border-slate-800">
-            <button
-              type="button"
-              onClick={() => setTier("Budget")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                tier === "Budget"
-                  ? "bg-teal-400 text-slate-950 shadow-md"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              }`}
-            >
-              🎒 Budget
-            </button>
-            <button
-              type="button"
-              onClick={() => setTier("Standard")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                tier === "Standard"
-                  ? "bg-teal-400 text-slate-950 shadow-md"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              }`}
-            >
-              🏨 Standard
-            </button>
-            <button
-              type="button"
-              onClick={() => setTier("Luxury")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                tier === "Luxury"
-                  ? "bg-teal-400 text-slate-950 shadow-md"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              }`}
-            >
-              ✨ Luxury
-            </button>
-          </div>
+          <select
+            value={transportMode}
+            onChange={(e) => setTransportMode(e.target.value)}
+            className="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-white focus:outline-none cursor-pointer appearance-none"
+          >
+            {TRANSPORT_MODES.map((mode) => (
+              <option key={mode.id} value={mode.id} className="bg-white dark:bg-[#0b1220] text-slate-900 dark:text-white">
+                {mode.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Days Input */}
-        <div className="md:col-span-2 bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800 rounded-2xl p-3">
+        <div className="md:col-span-3 bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800 rounded-2xl p-3">
           <label className="block text-[9px] font-black uppercase text-teal-600 dark:text-teal-400 tracking-wider mb-1">
             🗓️ DAYS
           </label>
@@ -133,6 +152,48 @@ export default function BudgetCalculator() {
           />
         </div>
 
+      </div>
+
+      {/* Travel Style Tier Toggle Row */}
+      <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-3">
+        <label className="block text-[10px] font-black uppercase text-teal-600 dark:text-teal-400 tracking-wider">
+          ⚡ TRAVEL STYLE / TIER
+        </label>
+        <div className="flex items-center gap-1 bg-white dark:bg-[#0b1220] p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+          <button
+            type="button"
+            onClick={() => setTier("Budget")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
+              tier === "Budget"
+                ? "bg-teal-400 text-slate-950 shadow-md"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            }`}
+          >
+            🎒 Budget
+          </button>
+          <button
+            type="button"
+            onClick={() => setTier("Standard")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
+              tier === "Standard"
+                ? "bg-teal-400 text-slate-950 shadow-md"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            }`}
+          >
+            🏨 Standard
+          </button>
+          <button
+            type="button"
+            onClick={() => setTier("Luxury")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
+              tier === "Luxury"
+                ? "bg-teal-400 text-slate-950 shadow-md"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            }`}
+          >
+            ✨ Luxury
+          </button>
+        </div>
       </div>
 
       {/* 3. Breakdown Cards Grid */}
@@ -234,7 +295,7 @@ export default function BudgetCalculator() {
       <div className="bg-teal-50/50 dark:bg-[#06121a] border border-teal-500/30 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
         <div>
           <span className="text-[10px] font-black uppercase text-teal-700 dark:text-teal-400 tracking-wider">
-            ⚡ ESTIMATED TOTAL FOR {selectedDest.name.toUpperCase()} ({days} DAYS)
+            ⚡ ESTIMATED TOTAL ({selectedSource} ➔ {selectedDest.name.toUpperCase()}) ({days} DAYS)
           </span>
           <div className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mt-1">
             ₹{grandTotal.toLocaleString()}

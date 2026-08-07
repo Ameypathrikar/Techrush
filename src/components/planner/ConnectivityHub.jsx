@@ -131,18 +131,24 @@ export default function ConnectivityHub() {
     `${city.name}, ${city.state}`.toLowerCase().includes(sourceInput.toLowerCase())
   );
 
-  // Using embedded query directions mode with compact view
   const mapUrl = `https://maps.google.com/maps?saddr=${encodeURIComponent(
     sourceInput
   )}&daddr=${encodeURIComponent(
     `${activeDest.name}, ${activeDest.state}`
   )}&output=embed&z=6`;
 
+  // Dynamic booking URL generators based on source and destination
+  const cleanSource = sourceInput.split(",")[0].trim();
+  const flightUrl = `https://www.google.com/travel/flights?q=flights+from+${encodeURIComponent(cleanSource)}+to+${encodeURIComponent(activeDest.name)}`;
+  const trainUrl = `https://www.makemytrip.com/railways/`;
+  const busUrl = `https://www.redbus.in/bus-tickets/${encodeURIComponent(cleanSource.toLowerCase())}-to-${encodeURIComponent(activeDest.name.toLowerCase())}`;
+  const driveUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(sourceInput)}&destination=${encodeURIComponent(`${activeDest.name}, ${activeDest.state}`)}`;
+
   return (
-    <div className="bg-white dark:bg-[#0b1220] border border-slate-200 dark:border-slate-800/90 rounded-3xl p-6 sm:p-8 space-y-7 shadow-xl dark:shadow-2xl transition-colors">
+    <div className="bg-white dark:bg-[#141f33] border border-slate-200 dark:border-slate-700/80 rounded-3xl p-6 sm:p-8 space-y-7 shadow-xl dark:shadow-2xl transition-colors">
       
       {/* 1. Header */}
-      <div className="flex items-center gap-3.5 border-b border-slate-100 dark:border-slate-800/80 pb-5">
+      <div className="flex items-center gap-3.5 border-b border-slate-100 dark:border-slate-700 pb-5">
         <div className="w-11 h-11 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-600 dark:text-sky-400 font-bold text-xl">
           ✈️
         </div>
@@ -150,7 +156,7 @@ export default function ConnectivityHub() {
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             Transit & Connectivity Hub
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+          <p className="text-xs text-slate-500 dark:text-slate-300 font-medium mt-0.5">
             Compare transit routes, travel times, and estimated fare prices side by side
           </p>
         </div>
@@ -161,7 +167,7 @@ export default function ConnectivityHub() {
         
         {/* Source City Autocomplete Input */}
         <div ref={sourceRef} className="relative">
-          <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800 rounded-2xl p-3 focus-within:border-sky-500/60 transition-all">
+          <div className="bg-slate-50 dark:bg-[#0e1726] border border-slate-200 dark:border-slate-700 rounded-2xl p-3 focus-within:border-sky-500/60 transition-all">
             <label className="block text-[9px] font-black uppercase text-sky-600 dark:text-sky-400 tracking-wider mb-1">
               📍 STARTING FROM (CITY IN INDIA)
             </label>
@@ -183,7 +189,7 @@ export default function ConnectivityHub() {
 
           {/* Source Autocomplete Suggestions Menu */}
           {showSourceDropdown && sourceSuggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#0b1220] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-56 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#141f33] border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-56 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700">
               {sourceSuggestions.map((city) => (
                 <div
                   key={city.name}
@@ -193,13 +199,13 @@ export default function ConnectivityHub() {
                     setSelectedSource(city);
                     setShowSourceDropdown(false);
                   }}
-                  className="p-3 flex items-center justify-between hover:bg-slate-100 dark:hover:bg-[#0f192d] cursor-pointer transition-colors"
+                  className="p-3 flex items-center justify-between hover:bg-slate-100 dark:hover:bg-[#1c2942] cursor-pointer transition-colors"
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-sky-500 dark:text-sky-400 text-xs">📍</span>
                     <span className="text-xs font-black text-slate-900 dark:text-white">{city.name}</span>
                   </div>
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{city.state}</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-300 font-medium">{city.state}</span>
                 </div>
               ))}
             </div>
@@ -207,7 +213,7 @@ export default function ConnectivityHub() {
         </div>
 
         {/* Target Destination Dropdown */}
-        <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800 rounded-2xl p-3 focus-within:border-sky-500/60 transition-all">
+        <div className="bg-slate-50 dark:bg-[#0e1726] border border-slate-200 dark:border-slate-700 rounded-2xl p-3 focus-within:border-sky-500/60 transition-all">
           <label className="block text-[9px] font-black uppercase text-sky-600 dark:text-sky-400 tracking-wider mb-1">
             🎯 TARGET DESTINATION
           </label>
@@ -217,7 +223,7 @@ export default function ConnectivityHub() {
             className="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-white focus:outline-none cursor-pointer appearance-none"
           >
             {DESTINATIONS.map((dest) => (
-              <option key={dest.id} value={dest.id} className="bg-white dark:bg-[#0b1220] text-slate-900 dark:text-white">
+              <option key={dest.id} value={dest.id} className="bg-white dark:bg-[#141f33] text-slate-900 dark:text-white">
                 {dest.name}, {dest.state} ({dest.code})
               </option>
             ))}
@@ -227,7 +233,7 @@ export default function ConnectivityHub() {
       </div>
 
       {/* 3. Distance Banner */}
-      <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 flex items-center justify-between">
+      <div className="bg-slate-50 dark:bg-[#0e1726] border border-slate-200 dark:border-slate-700 rounded-2xl p-4 flex items-center justify-between">
         <div className="flex items-center gap-2 text-xs font-extrabold text-slate-700 dark:text-slate-300">
           <span className="text-sky-500 dark:text-sky-400">🧭</span>
           <span>Approximate Distance ({sourceInput.split(",")[0]} ➔ {activeDest.name}):</span>
@@ -237,8 +243,8 @@ export default function ConnectivityHub() {
         </span>
       </div>
 
-      {/* 4. LIVE ROUTE MAP VISUALIZATION (Overflow hidden to clip floating card) */}
-      <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-2xl space-y-3 p-4">
+      {/* 4. LIVE ROUTE MAP VISUALIZATION */}
+      <div className="bg-slate-50 dark:bg-[#0e1726] border border-slate-200 dark:border-slate-700 rounded-3xl overflow-hidden shadow-2xl space-y-3 p-4">
         <div className="flex items-center justify-between px-2">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse inline-block" />
@@ -246,11 +252,10 @@ export default function ConnectivityHub() {
               Route Visualization Map ({sourceInput.split(",")[0]} ➔ {activeDest.name})
             </h3>
           </div>
-          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Google Maps Live Directions</span>
+          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-300">Google Maps Live Directions</span>
         </div>
 
-        <div className="relative w-full h-72 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800/80 bg-slate-950">
-          {/* Overlay mask to hide the floating directions list popup */}
+        <div className="relative w-full h-72 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-950">
           <div className="absolute top-0 left-0 w-64 h-32 pointer-events-none z-10 bg-gradient-to-br from-slate-950/80 to-transparent sm:block hidden" />
           <iframe
             title="Transit Route Map"
@@ -264,11 +269,11 @@ export default function ConnectivityHub() {
         </div>
       </div>
 
-      {/* 5. Transit Comparison Cards Grid */}
+      {/* 5. Transit Comparison Cards Grid with Dynamic Active Links */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         
         {/* Flight Option */}
-        <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 space-y-4 hover:border-sky-500/40 transition-all">
+        <div className="bg-slate-50 dark:bg-[#0e1726] border border-slate-200 dark:border-slate-700 rounded-2xl p-5 space-y-4 hover:border-sky-500/40 transition-all">
           <div className="flex justify-between items-center">
             <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
               Flight ✈️
@@ -278,16 +283,21 @@ export default function ConnectivityHub() {
             </span>
           </div>
           <div className="space-y-1 text-xs">
-            <p className="text-slate-500 dark:text-slate-400">⏱️ Est. Duration: <strong className="text-slate-900 dark:text-white">{activeDest.flightDur}</strong></p>
-            <p className="text-slate-500 dark:text-slate-400">💵 Avg. One-Way Fare: <strong className="text-teal-600 dark:text-teal-400">₹{activeDest.flightFare}</strong></p>
+            <p className="text-slate-500 dark:text-slate-300">⏱️ Est. Duration: <strong className="text-slate-900 dark:text-white">{activeDest.flightDur}</strong></p>
+            <p className="text-slate-500 dark:text-slate-300">💵 Avg. One-Way Fare: <strong className="text-teal-600 dark:text-teal-400">₹{activeDest.flightFare}</strong></p>
           </div>
-          <button className="w-full py-2.5 bg-white dark:bg-[#0b1220] hover:bg-sky-500/20 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2">
+          <a
+            href={flightUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-2.5 bg-white dark:bg-[#141f33] hover:bg-sky-500/20 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2"
+          >
             Check Live Tickets ↗
-          </button>
+          </a>
         </div>
 
         {/* Train Option */}
-        <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 space-y-4 hover:border-amber-500/40 transition-all">
+        <div className="bg-slate-50 dark:bg-[#0e1726] border border-slate-200 dark:border-slate-700 rounded-2xl p-5 space-y-4 hover:border-amber-500/40 transition-all">
           <div className="flex justify-between items-center">
             <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
               Train 🚆
@@ -297,16 +307,21 @@ export default function ConnectivityHub() {
             </span>
           </div>
           <div className="space-y-1 text-xs">
-            <p className="text-slate-500 dark:text-slate-400">⏱️ Est. Duration: <strong className="text-slate-900 dark:text-white">{activeDest.trainDur}</strong></p>
-            <p className="text-slate-500 dark:text-slate-400">💵 Avg. One-Way Fare: <strong className="text-teal-600 dark:text-teal-400">₹{activeDest.trainFare}</strong></p>
+            <p className="text-slate-500 dark:text-slate-300">⏱️ Est. Duration: <strong className="text-slate-900 dark:text-white">{activeDest.trainDur}</strong></p>
+            <p className="text-slate-500 dark:text-slate-300">💵 Avg. One-Way Fare: <strong className="text-teal-600 dark:text-teal-400">₹{activeDest.trainFare}</strong></p>
           </div>
-          <button className="w-full py-2.5 bg-white dark:bg-[#0b1220] hover:bg-amber-500/20 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2">
+          <a
+            href={trainUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-2.5 bg-white dark:bg-[#141f33] hover:bg-amber-500/20 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2"
+          >
             Check Live Tickets ↗
-          </button>
+          </a>
         </div>
 
         {/* Bus Option */}
-        <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 space-y-4 hover:border-purple-500/40 transition-all">
+        <div className="bg-slate-50 dark:bg-[#0e1726] border border-slate-200 dark:border-slate-700 rounded-2xl p-5 space-y-4 hover:border-purple-500/40 transition-all">
           <div className="flex justify-between items-center">
             <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
               Intercity Bus 🚌
@@ -316,16 +331,21 @@ export default function ConnectivityHub() {
             </span>
           </div>
           <div className="space-y-1 text-xs">
-            <p className="text-slate-500 dark:text-slate-400">⏱️ Est. Duration: <strong className="text-slate-900 dark:text-white">{activeDest.busDur}</strong></p>
-            <p className="text-slate-500 dark:text-slate-400">💵 Avg. One-Way Fare: <strong className="text-teal-600 dark:text-teal-400">₹{activeDest.busFare}</strong></p>
+            <p className="text-slate-500 dark:text-slate-300">⏱️ Est. Duration: <strong className="text-slate-900 dark:text-white">{activeDest.busDur}</strong></p>
+            <p className="text-slate-500 dark:text-slate-300">💵 Avg. One-Way Fare: <strong className="text-teal-600 dark:text-teal-400">₹{activeDest.busFare}</strong></p>
           </div>
-          <button className="w-full py-2.5 bg-white dark:bg-[#0b1220] hover:bg-purple-500/20 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2">
+          <a
+            href={busUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-2.5 bg-white dark:bg-[#141f33] hover:bg-purple-500/20 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2"
+          >
             Check Live Tickets ↗
-          </button>
+          </a>
         </div>
 
         {/* Self-Drive / Taxi Option */}
-        <div className="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 space-y-4 hover:border-rose-500/40 transition-all">
+        <div className="bg-slate-50 dark:bg-[#0e1726] border border-slate-200 dark:border-slate-700 rounded-2xl p-5 space-y-4 hover:border-rose-500/40 transition-all">
           <div className="flex justify-between items-center">
             <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
               Self-Drive / Taxi 🚘
@@ -335,12 +355,17 @@ export default function ConnectivityHub() {
             </span>
           </div>
           <div className="space-y-1 text-xs">
-            <p className="text-slate-500 dark:text-slate-400">⏱️ Est. Duration: <strong className="text-slate-900 dark:text-white">{activeDest.driveDur}</strong></p>
-            <p className="text-slate-500 dark:text-slate-400">💵 Avg. One-Way Fare: <strong className="text-teal-600 dark:text-teal-400">₹{activeDest.driveFare}</strong></p>
+            <p className="text-slate-500 dark:text-slate-300">⏱️ Est. Duration: <strong className="text-slate-900 dark:text-white">{activeDest.driveDur}</strong></p>
+            <p className="text-slate-500 dark:text-slate-300">💵 Avg. One-Way Fare: <strong className="text-teal-600 dark:text-teal-400">₹{activeDest.driveFare}</strong></p>
           </div>
-          <button className="w-full py-2.5 bg-white dark:bg-[#0b1220] hover:bg-rose-500/20 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2">
+          <a
+            href={driveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-2.5 bg-white dark:bg-[#141f33] hover:bg-rose-500/20 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2"
+          >
             Check Live Tickets ↗
-          </button>
+          </a>
         </div>
 
       </div>
