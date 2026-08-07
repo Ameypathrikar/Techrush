@@ -6,24 +6,7 @@ export function FavoritesProvider({ children }) {
   const [favorites, setFavorites] = useState(() => {
     try {
       const saved = localStorage.getItem("tripnest_favorites");
-      return saved ? JSON.parse(saved) : [
-        {
-          id: "goa",
-          name: "Goa",
-          category: "Beaches",
-          price: 1800,
-          image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80",
-          description: "Pristine beaches, Portuguese colonial heritage, and vibrant coastal culture."
-        },
-        {
-          id: "manali",
-          name: "Manali",
-          category: "Mountains",
-          price: 2500,
-          image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800&q=80",
-          description: "Snow capped Himalayan peaks, cedar forests, adventure sports, and ancient wooden temples."
-        }
-      ];
+      return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
     }
@@ -33,18 +16,31 @@ export function FavoritesProvider({ children }) {
     localStorage.setItem("tripnest_favorites", JSON.stringify(favorites));
   }, [favorites]);
 
+  const normalizeId = (dest) => {
+    if (!dest) return "";
+    if (typeof dest === "string") return dest.toLowerCase().trim();
+    const val = dest.id || dest.name || "";
+    return val.toLowerCase().split(",")[0].trim();
+  };
+
   const toggleFavorite = (dest) => {
     setFavorites((prev) => {
-      const exists = prev.some((item) => item.id === dest.id);
+      const targetKey = normalizeId(dest);
+      const exists = prev.some((item) => normalizeId(item) === targetKey);
+      
       if (exists) {
-        return prev.filter((item) => item.id !== dest.id);
+        return prev.filter((item) => normalizeId(item) !== targetKey);
       } else {
-        return [...prev, dest];
+        const newObj = typeof dest === "object" ? dest : { id: targetKey, name: dest };
+        return [...prev, newObj];
       }
     });
   };
 
-  const isFavorite = (id) => favorites.some((item) => item.id === id);
+  const isFavorite = (dest) => {
+    const targetKey = normalizeId(dest);
+    return favorites.some((item) => normalizeId(item) === targetKey);
+  };
 
   return (
     <FavoritesContext.Provider value={{ favorites, toggleFavorite, isFavorite }}>
