@@ -35,13 +35,14 @@ export default function Home() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    navigate(`/explore?search=${destination}&budget=${maxBudget}`);
+    const numericBudget = maxBudget.replace(/[^0-9]/g, "");
+    navigate(`/explore?search=${encodeURIComponent(destination)}&budget=${numericBudget}`);
   };
 
   const handleQuickSelect = (name) => {
     setDestination(name);
     setShowDropdown(false);
-    navigate(`/explore?search=${name}`);
+    navigate(`/explore?search=${encodeURIComponent(name)}`);
   };
 
   return (
@@ -68,83 +69,85 @@ export default function Home() {
                 Planned Effortlessly
               </span>
             </h1>
-            {/* Slightly increased subtitle font size */}
             <p className="text-slate-700 dark:text-slate-200 text-sm sm:text-base font-semibold max-w-2xl mx-auto leading-relaxed drop-shadow">
               Discover optimal destinations, build custom itineraries, and track live conditions — all in one place.
             </p>
           </div>
 
           {/* Search Box with Larger Input Text */}
-          <form onSubmit={handleSearch} className="relative max-w-3xl mx-auto bg-white/95 dark:bg-[#141f33]/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl p-3 shadow-2xl flex flex-col sm:flex-row items-center gap-3">
-            
-            <div ref={dropdownRef} className="flex-1 relative flex items-center gap-3 px-3 w-full border-b sm:border-b-0 sm:border-r border-slate-200 dark:border-slate-700 pb-2 sm:pb-0">
-              <FiMapPin className="text-teal-600 dark:text-teal-400 shrink-0 text-base" />
-              <div className="text-left w-full">
-                <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-400 tracking-wider">
-                  DESTINATION
-                </label>
-                <input
-                  type="text"
-                  value={destination}
-                  onFocus={() => setShowDropdown(true)}
-                  onChange={(e) => {
-                    setDestination(e.target.value);
-                    setShowDropdown(true);
-                  }}
-                  placeholder="Where to? (e.g. Goa, Manali, Ladakh)"
-                  className="w-full bg-transparent text-sm sm:text-base font-bold text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 focus:outline-none"
-                />
-              </div>
-
-              {showDropdown && filteredSuggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-[#141f33] border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-60 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700 text-left">
-                  {filteredSuggestions.map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => {
-                        setDestination(item.name);
-                        setShowDropdown(false);
-                      }}
-                      className="p-3.5 flex items-center justify-between hover:bg-slate-100 dark:hover:bg-[#1c2942] cursor-pointer"
-                    >
-                      <div className="flex items-center gap-3">
-                        <img src={item.image} alt={item.name} className="w-10 h-10 rounded-xl object-cover shrink-0" />
-                        <div>
-                          <h4 className="text-sm font-black text-slate-900 dark:text-white">{item.name}</h4>
-                          <p className="text-xs text-slate-500 dark:text-slate-300">{item.category} • ₹{item.price}/day</p>
-                        </div>
-                      </div>
-                      <span className="text-xs font-bold text-teal-600 dark:text-teal-400">Select →</span>
-                    </div>
-                  ))}
+          <div className="relative max-w-3xl mx-auto" ref={dropdownRef}>
+            <form onSubmit={handleSearch} className="bg-white/95 dark:bg-[#141f33]/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl p-3 shadow-2xl flex flex-col sm:flex-row items-center gap-3">
+              
+              <div className="flex-1 relative flex items-center gap-3 px-3 w-full border-b sm:border-b-0 sm:border-r border-slate-200 dark:border-slate-700 pb-2 sm:pb-0">
+                <FiMapPin className="text-teal-600 dark:text-teal-400 shrink-0 text-base" />
+                <div className="text-left w-full">
+                  <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-400 tracking-wider">
+                    DESTINATION
+                  </label>
+                  <input
+                    type="text"
+                    value={destination}
+                    onFocus={() => setShowDropdown(true)}
+                    onChange={(e) => {
+                      setDestination(e.target.value);
+                      setShowDropdown(true);
+                    }}
+                    placeholder="Where to? (e.g. Goa, Manali, Ladakh)"
+                    className="w-full bg-transparent text-sm sm:text-base font-bold text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 focus:outline-none"
+                  />
                 </div>
-              )}
-            </div>
-
-            <div className="flex-1 flex items-center gap-3 px-3 w-full">
-              <FiDollarSign className="text-teal-600 dark:text-teal-400 shrink-0 text-base" />
-              <div className="text-left w-full">
-                <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-400 tracking-wider">
-                  MAX BUDGET
-                </label>
-                <input
-                  type="text"
-                  value={maxBudget}
-                  onChange={(e) => setMaxBudget(e.target.value)}
-                  placeholder="e.g. ₹2,000 / day"
-                  className="w-full bg-transparent text-sm sm:text-base font-bold text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 focus:outline-none"
-                />
               </div>
-            </div>
 
-            <button
-              type="submit"
-              className="w-full sm:w-auto px-7 py-4 bg-teal-400 hover:bg-teal-300 text-slate-950 font-black text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-teal-500/20 cursor-pointer shrink-0"
-            >
-              <FiSearch className="text-base" />
-              <span>Search</span>
-            </button>
-          </form>
+              <div className="flex-1 flex items-center gap-3 px-3 w-full">
+                <FiDollarSign className="text-teal-600 dark:text-teal-400 shrink-0 text-base" />
+                <div className="text-left w-full">
+                  <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-400 tracking-wider">
+                    MAX BUDGET
+                  </label>
+                  <input
+                    type="text"
+                    value={maxBudget}
+                    onChange={(e) => setMaxBudget(e.target.value)}
+                    placeholder="e.g. ₹2,000 / day"
+                    className="w-full bg-transparent text-sm sm:text-base font-bold text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full sm:w-auto px-7 py-4 bg-teal-400 hover:bg-teal-300 text-slate-950 font-black text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-teal-500/20 cursor-pointer shrink-0"
+              >
+                <FiSearch className="text-base" />
+                <span>Search</span>
+              </button>
+            </form>
+
+            {/* Dropdown positioned cleanly relative to the outer search wrapper box */}
+            {showDropdown && filteredSuggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#141f33] border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden z-[200] max-h-60 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700 text-left">
+                {filteredSuggestions.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => {
+                      setDestination(item.name);
+                      setShowDropdown(false);
+                    }}
+                    className="p-3.5 flex items-center justify-between hover:bg-slate-100 dark:hover:bg-[#1c2942] cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3">
+                      <img src={item.image} alt={item.name} className="w-10 h-10 rounded-xl object-cover shrink-0" />
+                      <div>
+                        <h4 className="text-sm font-black text-slate-900 dark:text-white">{item.name}</h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-300">{item.category} • ₹{item.price}/day</p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold text-teal-600 dark:text-teal-400">Select →</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Quick Filter Tags */}
           <div className="relative flex flex-wrap items-center justify-center gap-2.5 pt-2 text-xs font-bold">
